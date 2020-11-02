@@ -96,6 +96,10 @@
 
 ### 2、第一个Mybatis项目
 
+
+
+
+
 每个基于 MyBatis 的应用都是以一个 **SqlSessionFactory** 的实例为核心的。SqlSessionFactory 的实例可以通过 SqlSessionFactoryBuilder 获得。而 SqlSessionFactoryBuilder 则可以从 XML 配置文件或一个预先配置的 Configuration 实例来构建出 SqlSessionFactory 实例。
 
 
@@ -106,7 +110,7 @@
 
 ​		2、导入相关的依赖
 
-​		pom.xml
+#### 		pom.xml
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -120,6 +124,8 @@
     <version>1.0-SNAPSHOT</version>
 
     <dependencies>
+        	
+        
         <dependency>
             <groupId>org.mybatis</groupId>
             <artifactId>mybatis</artifactId>
@@ -137,6 +143,14 @@
             <artifactId>log4j</artifactId>
             <version>1.2.17</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/junit/junit -->
+		<dependency>
+    		<groupId>junit</groupId>
+    		<artifactId>junit</artifactId>
+    		<version>4.12</version>
+    		<scope>test</scope>
+		</dependency>
+
 
     </dependencies>
 
@@ -204,7 +218,9 @@ public class Book {
 
 ​		5、创建对应的dao类
 
-BookDao.java
+#### BookDao.java
+
+​	只需实现接口，具体实现逻辑在UserDao中实现
 
 ```java
 package com.dzp.dao;
@@ -234,7 +250,7 @@ username = root
 password = 123456
 ```
 
-mybatis-config.xml
+#### mybatis-config.xml
 
 ```xml
 <?xml version="1.0" encoding="UTF-8" ?>
@@ -242,6 +258,7 @@ mybatis-config.xml
         PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
+<!--    <properties resource=""-->
     <environments default="development">
         <environment id="development">
             <transactionManager type="JDBC"/>	<!--事务管理器-->
@@ -256,12 +273,14 @@ mybatis-config.xml
     </environments>
     <!--引入每一个接口对应点xml文件-->
     <mappers>
-        <mapper resource="BookDao.xml"/>
+        <mapper resource="UserDao.xml"/>
     </mappers>
 </configuration>
 ```
 
-BookpDao.xml
+#### BookDao.xml
+
+​	id = BookDao中的方法名
 
 ```xml
 <?xml version="1.0" encoding="UTF-8" ?>
@@ -298,7 +317,7 @@ BookpDao.xml
 
 ​		7、编写测试类
 
-MyTest.java
+#### MyTest.java
 
 ```java
 package com.mashibing.test;
@@ -316,11 +335,9 @@ import java.io.InputStream;
 
 public class MyTest {
 
-    @Test
-    public void test01() {
-        // 根据全局配置文件创建出SqlSessionFactory
-        // SqlSessionFactory:负责创建SqlSession对象的工厂
-        // SqlSession:表示跟数据库建议的一次会话
+    SqlSessionFactory sqlSessionFactory = null;
+    @Before
+    public void init(){
         String resource = "mybatis-config.xml";
         InputStream inputStream = null;
         try {
@@ -328,21 +345,20 @@ public class MyTest {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
-        // 获取数据库的会话
-        SqlSession sqlSession = sqlSessionFactory.openSession();
-        Emp empByEmpno = null;
-        try {
-            // 获取要调用的接口类
-            EmpDao mapper = sqlSession.getMapper(EmpDao.class);
-            // 调用方法开始执行
-            empByEmpno = mapper.findEmpByEmpno(7369);
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            sqlSession.close();
-        }
-        System.out.println(empByEmpno);
+        sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+    }
+    @Test
+    public void test00(){
+        //设置true自动提交事务
+        SqlSession sqlSession = sqlSessionFactory.openSession(true);
+        UserDao mapper = sqlSession.getMapper(UserDao.class);
+        User user = new User();
+        user.setName("xixi");
+        user.setId(5);
+        Integer save = mapper.save(user);
+        sqlSession.commit();
+        sqlSession.close();
+    }.println(empByEmpno);
     }
 }
 ```
@@ -644,7 +660,7 @@ springboot在什么时候启动了session?
   ~~~
 
 * 想要自定义的操作数据库的方法在dao中书写
-* 创建mapper映射xml文件，
+* 创建mapper映射xml文件，里面是dao中方法的具体实现
   * namespace为要操作的接口类
   * 写增删改查的sql语句，如select中的id 要与mapper类中的方法对应
 

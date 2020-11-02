@@ -75,7 +75,7 @@ echo 'dzp first input' > README.MF
 | git fetch 远程别名 推送分支 | pull(不同步到工作区) |
 | git checkout test/master    | 确认内容             |
 | git merge test/master       | 合并                 |
-| git pull 远程别名 推送分支  |                      |
+| git pull 远程别名 推送分支  | 拉取远程库的内容     |
 
 ### 克隆
 

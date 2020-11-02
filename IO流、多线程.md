@@ -239,11 +239,27 @@ mainæ–¹æ³•å…¶å®ä¹Ÿæ˜¯ä¸€ä¸ªçº¿ç¨‹
 
 interruptç»“æŸçº¿ç¨‹
 
+### ç»ƒä¹ é¢˜ç›®å½•
+
+c_009
+
 ### **å®ç°æ–¹å¼**
 
-* ç»§æ‰¿*Tread*ç±»
+* ç»§æ‰¿*Tread*ç±»,é‡å†™runæ–¹æ³•
 * å®ç°*Runable*æ¥å£
+  * new Thread(new Runable()).start
+  * new Thread(()->{sout("helloï¼Œthread");}).start
 * å®ç°callableæ¥å£ï¼ˆæœ‰è¿”å›å€¼ï¼‰
+
+```java
+public static void main(String[] args) {
+    T01 t01 = new T01();
+    //new Thread(()->t.m1(),"t1")
+    //ç›¸å½“äºå†…éƒ¨new Runable()
+    new Thread(t01::m1,"t1").start();
+    new Thread(t01::m2,"t2").start();
+}
+```
 
 #### æ‰©å±•java.lang.Threadç±»
 
@@ -352,18 +368,6 @@ Objectç±»ä¸­çš„wait()æ–¹æ³•ï¼Œå¯¼è‡´å½“å‰çš„çº¿ç¨‹ç­‰å¾…ï¼Œç›´åˆ°å…¶ä»–çº¿ç¨‹è°
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 Thread implements Runnable
 
 ```java
@@ -450,6 +454,8 @@ public class Runnerbleå–ç¥¨ implements Runnable {
 
 **æš‚åœå½“å‰æ­£åœ¨æ‰§è¡Œçš„çº¿ç¨‹å¯¹è±¡ï¼Œå¹¶æ‰§è¡Œå…¶ä»–çº¿ç¨‹ã€‚**
 
+**å­¦æœ¯ä¸Šå­˜åœ¨ï¼Œå·¥ç¨‹ä¸Šå¾ˆå°‘ç”¨**
+
 å…ˆæ£€æµ‹å½“å‰æ˜¯å¦æœ‰ç›¸åŒä¼˜å…ˆçº§çš„çº¿ç¨‹å¤„äºåŒå¯è¿è¡ŒçŠ¶æ€ï¼Œå¦‚æœ‰ï¼Œåˆ™æŠŠ CPU çš„å æœ‰æƒäº¤ç»™æ­¤çº¿ç¨‹ï¼Œå¦åˆ™ï¼Œç»§ç»­è¿è¡ŒåŸæ¥çš„çº¿ç¨‹ã€‚
 
 ä½†æœ‰å¯èƒ½ç»§ç»­æŠ¢å åˆ°cpu
@@ -466,19 +472,93 @@ Thread.sleep()ä¸Object.wait()äºŒè€…éƒ½å¯ä»¥æš‚åœå½“å‰çº¿ç¨‹ï¼Œé‡Šæ”¾CPUæ§åˆ
 
 
 
-### é”æœºåˆ¶
+## é¢è¯•é¢˜
 
-#### synchronizeé”
+é«˜å¹¶å‘4 - 10:14
+
+## é”
+
+é”çš„æ˜¯å¯¹è±¡ä¸æ˜¯ä»£ç ï¼Œä¹Ÿä¸æ˜¯ä½ æƒ³åŒæ­¥çš„æ•°å­—ï¼Œè¿™ä¸ªé”å®šçš„å¯¹è±¡ç”šè‡³å¯ä»¥æ˜¯ä½ è‡ªå®šä¹‰çš„å¯¹è±¡
+
+synchronized(Object)
+
+-ä½†æ˜¯ä¸èƒ½ç”¨String Integer Long
+
+**è¢«é”çš„å¯¹è±¡äºŒè¿›åˆ¶çš„å‰ä¸¤ä½çŠ¶æ€ä¸åŒ**
+
+### é”åˆ†ç±»
+
+#### synchronizeé”(æ‚²è§‚é”)
+
+##### ç‰¹æ€§
+
+sleepä¸ä¼šé‡Šæ”¾é”ï¼Œwaitä¼š
+
+**å¯é‡å…¥é”**
+	å¦‚æœåŠ é”çš„æ–¹æ³•aä¸­è°ƒç”¨äº†åŠ é”æ–¹æ³•bï¼Œå½“aå‘ç°båŠ é”çš„å¯¹è±¡ä¸è‡ªå·±ç›¸åŒæ—¶ï¼Œä¼šå…è®¸æ‰§è¡Œ
+
+##### é”çš„å‡çº§(æ— é”ã€åå‘ã€è‡ªæ—‹ã€é‡é‡çº§)
+
+jdkæ—©æœŸæ˜¯ é‡é‡çº§é”-os ,éƒ½è¦æ‰¾æ“ä½œç³»ç»Ÿï¼ˆå†…æ ¸ï¼‰å»ç”³è¯·é”
+
+é¦–å…ˆæ˜¯åå‘é”ï¼Œmarkword è®°å½•è¿™ä¸ªçº¿ç¨‹ID ï¼ˆäºŒè¿›åˆ¶çš„å¤´ä¸¤ä½ï¼‰
+
+å¦‚æœçº¿ç¨‹äº‰ç”¨ï¼Œå‡çº§ä¸ºè‡ªæ—‹é”ï¼ˆå ç”¨cpuï¼‰
+
+è‡ªæ—‹10æ¬¡åå‡çº§ä¸ºé‡é‡çº§é”-OS
 
 
 
-é”çš„æ˜¯å¯¹è±¡ä¸æ˜¯ä»£ç 
+å¦ä¸€ä¸ªçº¿ç¨‹å¾ªç¯åˆ¤æ–­æ˜¯å¦èƒ½æ‹¿åˆ°é”
 
-this XX.class
+åå‘é”ä¸æ˜¯åŠ é”ï¼Œè€Œæ˜¯è®°ä½ç¬¬ä¸€ä¸ªæ‹¿åˆ°çš„çº¿ç¨‹ï¼Œå€¾å‘äºä»–å…ˆæ‰§è¡Œ
 
-å…¶ä»–çº¿ç¨‹çœ‹è¢«é”å¯¹è±¡çš„å‰ä¸¤ä½ï¼ˆ64ä½ï¼‰
+
+
+##### é”çš„ä¸åŒå®ç°æ–¹å¼
 
 ```java
+public class T01 {
+
+    private int i = 0;
+    public Object o = new Object();
+    public void m(){
+        synchronized (o){
+            i++;
+            System.out.println(Thread.currentThread().getName());
+        }
+    }
+    //é”ä½å½“å‰å¯¹è±¡
+    public void s(){
+        synchronized (this){
+            i++;
+            System.out.println(Thread.currentThread().getName());
+        }
+    }
+    //æ‰§è¡Œæ—¶ä¸ä¸Šä¸€ä¸ªç­‰ä»·
+    public synchronized void n(){
+        i++;
+        System.out.println(Thread.currentThread().getName());
+    }
+    public synchronized static void o(){//æ­¤æ—¶ç­‰åŒäºsynchronizedï¼ˆT01.classï¼‰
+    }
+}
+```
+
+
+
+æ¨¡æ‹Ÿé“¶è¡Œè´¦æˆ·
+
+```java
+/**
+ * é¢è¯•é¢˜ï¼šæ¨¡æ‹Ÿé“¶è¡Œè´¦æˆ·
+ * å¯¹ä¸šåŠ¡å†™æ–¹æ³•åŠ é”
+ * å¯¹ä¸šåŠ¡è¯»æ–¹æ³•ä¸åŠ é”
+ * è¿™æ ·è¡Œä¸è¡Œï¼Ÿ
+ *
+ * å®¹æ˜“äº§ç”Ÿè„è¯»é—®é¢˜ï¼ˆdirtyReadï¼‰
+ */
+
 package com.dzp;
 
 import java.util.concurrent.TimeUnit;
@@ -517,65 +597,2396 @@ public class Account {
 }
 ```
 
-##### ä¼˜åŒ–
+##### å¼‚å¸¸å¤„ç†
 
-é‡‡ç”¨ç»†ç²’åº¦çš„é”ï¼Œå°½é‡ä¸è¦å°†æ— éœ€é”çš„ä»£ç æ”¾å…¥å…¶ä¸­
+```java
+/**
+ * ç¨‹åºåœ¨æ‰§è¡Œè¿‡ç¨‹ä¸­ï¼Œå¦‚æœå‡ºç°å¼‚å¸¸ï¼Œé»˜è®¤æƒ…å†µé”ä¼šè¢«é‡Šæ”¾
+ * æ‰€ä»¥ï¼Œåœ¨å¹¶å‘å¤„ç†çš„è¿‡ç¨‹ä¸­ï¼Œæœ‰å¼‚å¸¸è¦å¤šåŠ å°å¿ƒï¼Œä¸ç„¶å¯èƒ½ä¼šå‘ç”Ÿä¸ä¸€è‡´çš„æƒ…å†µã€‚
+ * æ¯”å¦‚ï¼Œåœ¨ä¸€ä¸ªweb appå¤„ç†è¿‡ç¨‹ä¸­ï¼Œå¤šä¸ªservletçº¿ç¨‹å…±åŒè®¿é—®åŒä¸€ä¸ªèµ„æºï¼Œè¿™æ—¶å¦‚æœå¼‚å¸¸å¤„ç†ä¸åˆé€‚ï¼Œ
+ * åœ¨ç¬¬ä¸€ä¸ªçº¿ç¨‹ä¸­æŠ›å‡ºå¼‚å¸¸ï¼Œå…¶ä»–çº¿ç¨‹å°±ä¼šè¿›å…¥åŒæ­¥ä»£ç åŒºï¼Œæœ‰å¯èƒ½ä¼šè®¿é—®åˆ°å¼‚å¸¸äº§ç”Ÿæ—¶çš„æ•°æ®ã€‚
+ * å› æ­¤è¦éå¸¸å°å¿ƒçš„å¤„ç†åŒæ­¥ä¸šåŠ¡é€»è¾‘ä¸­çš„å¼‚å¸¸
+ * @author mashibing
+ */
+package com.mashibing.juc.c_011;
 
-å½“é”æ¯”è¾ƒå¯†é›†çš„æ—¶å€™ï¼Œå¯ä»¥ç²—åŒ–é”
+import java.util.concurrent.TimeUnit;
+
+public class T {
+   int count = 0;
+   synchronized void m() {
+      System.out.println(Thread.currentThread().getName() + " start");
+      while(true) {
+         count ++;
+         System.out.println(Thread.currentThread().getName() + " count = " + count);
+         try {
+            TimeUnit.SECONDS.sleep(1);
+            
+         } catch (InterruptedException e) {
+            e.printStackTrace();
+         }
+         
+         if(count == 5) {
+            int i = 1/0; //æ­¤å¤„æŠ›å‡ºå¼‚å¸¸ï¼Œé”å°†è¢«é‡Šæ”¾ï¼Œè¦æƒ³ä¸è¢«é‡Šæ”¾ï¼Œå¯ä»¥åœ¨è¿™é‡Œè¿›è¡Œcatchï¼Œç„¶åè®©å¾ªç¯ç»§ç»­
+            System.out.println(i);
+         }
+      }
+   }
+   
+   public static void main(String[] args) {
+      T t = new T();
+      Runnable r = new Runnable() {
+
+         @Override
+         public void run() {
+            t.m();
+         }
+         
+      };
+      new Thread(r, "t1").start();
+      
+      try {
+         TimeUnit.SECONDS.sleep(3);
+      } catch (InterruptedException e) {
+         e.printStackTrace();
+      }
+      
+      new Thread(r, "t2").start();
+   }
+   
+}
+```
 
 
 
-é”å®šæŸå¯¹è±¡oï¼Œå¦‚æœoçš„å±æ€§å‘ç”Ÿæ”¹å˜ï¼Œä¸å½±å“é”çš„ä½¿ç”¨ã€‚
+
+
+
+
+#### CAS(ä¹è§‚é”ã€æ— é”ä¼˜åŒ– è‡ªæ—‹)
+
+* Compare And Set	(å¯ä»¥å½“ä½œæ˜¯ä¸€ä¸ªæ–¹æ³•)
+* cas(V,Expected,NewValue)
+* cas(è¦æ”¹çš„å€¼ï¼ŒæœŸæœ›å€¼ï¼Œæ–°å€¼)
+  * -if V == E
+    V = New
+    otherwise try again or fail
+  * å› ä¸ºcpuåŸè¯­æ”¯æŒï¼Œæ‰€ä»¥è¿™ä¸‰éƒ¨ä¸ä¼šè¢«æ‰“ä¹±
+  * æ¯”å¦‚count++æ“ä½œï¼Œè¿™ä¸ªçº¿ç¨‹é¦–å…ˆæ‹¿åˆ°å½“å‰çš„å€¼ä¸º1ï¼Œåé¢è¦è¿›è¡Œcasæ“ä½œï¼Œé‚£ä¹ˆæœŸæœ›å€¼å°±æ˜¯1ï¼Œæ­¤æ—¶å†çœ‹Væ˜¯å¤šå°‘ï¼Œçœ‹V==Eå¦ã€‚
+* ABAé—®é¢˜	åŠ ç‰ˆæœ¬å·è§£å†³
+  * åŸºç¡€ç±»å‹æ²¡æœ‰å½±å“
+  * å¦‚æœæ˜¯å¼•ç”¨ç±»å‹ï¼Œæ¯”å¦‚å¼•ç”¨æ²¡å˜ï¼Œä½†æ˜¯å†…å®¹å˜äº†
+  * æ¯”å¦‚å¼•ç”¨åœ¨ä¸­é—´è¢«å¦ä¸€ä¸ªçº¿ç¨‹æ”¹ä¸ºbï¼Œæ”¹å˜äº†b,åˆæ”¹å›a,æ°å·§aåˆå¯¹bæœ‰å¼•ç”¨ã€‚
+* å†…éƒ¨åˆ©ç”¨äº†Unsafeç±»å®ç°casæ“ä½œ
+
+LOCKç±»å‹ï¼Ÿ
+
+
+
+##### é€šè¿‡ Atomic å®ç°
+
+```java
+public class AtomicInteger_ {
+    AtomicInteger count = new AtomicInteger(0);
+    void m(){
+        for (int i = 0; i <1000 ; i++) {
+            count.incrementAndGet();
+        }
+    }
+
+    public static void main(String[] args) {
+        AtomicInteger_ t = new AtomicInteger_();
+        List<Thread> threads = new ArrayList<>();
+        for (int i = 0; i <10 ; i++) {
+             threads.add(new Thread(t::m,"thread-"+i));
+        }
+        threads.forEach((o)->o.start());
+        threads.forEach((o)->{
+            try {
+                o.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
+        System.out.println(t.count);
+    }
+
+
+}
+```
+
+#### é€’å¢ç¨‹åºæ—¶é—´æ¯”è¾ƒ
+
+**LongAdder**æ˜¯é€šè¿‡åˆ†å—é”ï¼Œåˆ†åˆ«åŠ é”è®¡ç®—ï¼Œæœ€åå†åŠ èµ·æ¥å¾—åˆ°æ€»æ•°ã€‚
+
+```java
+package com.mashibing.juc.c_018_00_AtomicXXX;
+
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.LongAdder;
+
+public class T02_AtomicVsSyncVsLongAdder {
+    static AtomicLong count1 = new AtomicLong(0L);
+    static long count2 = 0L;
+    static LongAdder count3 = new LongAdder();
+
+    public static void main(String[] args) throws Exception {
+        Thread[] threads = new Thread[1000];
+
+        for(int i=0; i<threads.length; i++) {
+            threads[i] =
+                    new Thread(()-> {
+                        for(int k=0; k<100000; k++) count1.incrementAndGet();
+                    });
+        }
+
+        long start = System.currentTimeMillis();
+
+        for(Thread t : threads ) t.start();
+
+        for (Thread t : threads) t.join();
+
+        long end = System.currentTimeMillis();
+
+        //TimeUnit.SECONDS.sleep(10);
+
+        System.out.println("Atomic: " + count1.get() + " time " + (end-start));
+        //-----------------------------------------------------------
+        Object lock = new Object();
+
+        for(int i=0; i<threads.length; i++) {
+            threads[i] =
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        for (int k = 0; k < 100000; k++)
+                            synchronized (lock) {
+                                count2++;
+                            }
+                    }
+                });
+        }
+
+        start = System.currentTimeMillis();
+
+        for(Thread t : threads ) t.start();
+
+        for (Thread t : threads) t.join();
+
+        end = System.currentTimeMillis();
+
+
+        System.out.println("Sync: " + count2 + " time " + (end-start));
+
+
+        //----------------------------------
+        for(int i=0; i<threads.length; i++) {
+            threads[i] =
+                    new Thread(()-> {
+                        for(int k=0; k<100000; k++) count3.increment();
+                    });
+        }
+
+        start = System.currentTimeMillis();
+
+        for(Thread t : threads ) t.start();
+
+        for (Thread t : threads) t.join();
+
+        end = System.currentTimeMillis();
+
+        //TimeUnit.SECONDS.sleep(10);
+
+        System.out.println("LongAdder: " + count1.longValue() + " time " + (end-start));
+
+    }
+
+    static void microSleep(int m) {
+        try {
+            TimeUnit.MICROSECONDS.sleep(m);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+}
+```
+
+#### ReentrantLock
+
+* ç‰¹ç‚¹
+  
+* å¿…é¡»æ‰‹åŠ¨é‡Šæ”¾é”ï¼ˆæ”¾åœ¨finallyä¸­æ‰§è¡Œï¼‰
+  
+* å¯é‡å…¥é”
+  * åœ¨åŒä¸€ä¸ªçº¿ç¨‹ä¸­
+  * æ‰§è¡ŒåŒæ­¥æ–¹æ³•1ä¸­è°ƒç”¨äº†åŒæ­¥æ–¹æ³•2ï¼Œä¸¤è€…é”çš„æ˜¯åŒä¸€ä¸ªå¯¹è±¡ï¼Œ2å¯ä»¥æ‰§è¡Œ
+
+* æ¯”synchronizeçµæ´»
+
+* å¯è®¾ç½®ä¸ºå…¬å¹³é”
+
+  * ```java
+    private static ReentrantLock lock=new ReentrantLock(true); //å‚æ•°ä¸ºtrueè¡¨ç¤ºä¸ºå…¬å¹³é”ï¼Œè¯·å¯¹æ¯”è¾“å‡ºç»“æœ
+    ```
+
+  * æ–°çº¿ç¨‹ä¼šå…ˆæ£€æŸ¥é˜Ÿåˆ—ä¸­æœ‰æ²¡æœ‰çº¿ç¨‹ï¼Œå¦‚æœæœ‰ï¼Œå°±è¿›é˜Ÿåˆ—ç­‰å¾…å…¶ä»–çº¿ç¨‹å…ˆæ‰§è¡Œ
+
+  * å…¬å¹³é”ä¸‹ä¸ä¼šå‡ºç°å¤§è§„æ¨¡çº¿ç¨‹1åœ¨æ‰§è¡Œï¼Œå¤§æ¦‚æ˜¯çº¿ç¨‹1,2äº¤æ›¿æ‰§è¡Œï¼Œçº¿ç¨‹1ä¹Ÿä¼šè¿ç»­æ‰§è¡Œ2æ¬¡ï¼Œå› ä¸ºåœ¨1æ‰§è¡Œå®Œæ—¶ï¼Œå…¶ä»–çº¿ç¨‹è¿˜æ²¡æœ‰è¿›é˜Ÿåˆ—ï¼Œçº¿ç¨‹1åˆä¸€æ¬¡è¿›å…¥ï¼Œæ‰€ä»¥ä¼šè¿ç»­æ‰§è¡Œï¼Œä½†ä¸ä¼šå¤§è§„æ¨¡è¿ç»­æ‰§è¡Œï¼Œå› ä¸ºçº¿ç¨‹2ä¸ä¼šæ‹–å»¶å¤ªé•¿æ—¶é—´æŒ¤ä¸è¿›å»ã€‚
+
+* ä½¿ç”¨æ–¹æ³•
+
+  * trylock
+  * lockinterupptibly
+
+  ```java
+  /**
+   * reentrantlockç”¨äºæ›¿ä»£synchronized
+   * ç”±äºm1é”å®šthis,åªæœ‰m1æ‰§è¡Œå®Œæ¯•çš„æ—¶å€™,m2æ‰èƒ½æ‰§è¡Œ
+   * è¿™é‡Œæ˜¯å¤ä¹ synchronizedæœ€åŸå§‹çš„è¯­ä¹‰
+   * 
+   * ä½¿ç”¨reentrantlockå¯ä»¥å®ŒæˆåŒæ ·çš„åŠŸèƒ½
+   * éœ€è¦æ³¨æ„çš„æ˜¯ï¼Œå¿…é¡»è¦å¿…é¡»è¦å¿…é¡»è¦æ‰‹åŠ¨é‡Šæ”¾é”ï¼ˆé‡è¦çš„äº‹æƒ…è¯´ä¸‰éï¼‰
+   * ä½¿ç”¨syné”å®šçš„è¯å¦‚æœé‡åˆ°å¼‚å¸¸ï¼Œjvmä¼šè‡ªåŠ¨é‡Šæ”¾é”ï¼Œä½†æ˜¯lockå¿…é¡»æ‰‹åŠ¨é‡Šæ”¾é”ï¼Œå› æ­¤ç»å¸¸åœ¨finallyä¸­è¿›è¡Œé”çš„é‡Šæ”¾
+   * 
+   * ä½¿ç”¨reentrantlockå¯ä»¥è¿›è¡Œâ€œå°è¯•é”å®šâ€tryLockï¼Œè¿™æ ·æ— æ³•é”å®šï¼Œæˆ–è€…åœ¨æŒ‡å®šæ—¶é—´å†…æ— æ³•é”å®šï¼Œçº¿ç¨‹å¯ä»¥å†³å®šæ˜¯å¦ç»§ç»­ç­‰å¾…
+   * @author mashibing
+   */
+  package com.mashibing.juc.c_020;
+  
+  import java.util.concurrent.TimeUnit;
+  import java.util.concurrent.locks.Lock;
+  import java.util.concurrent.locks.ReentrantLock;
+  
+  public class T03_ReentrantLock3 {
+  	Lock lock = new ReentrantLock();
+  	void m1() {
+  		try {
+  			lock.lock();
+  			for (int i = 0; i < 3; i++) {
+  				TimeUnit.SECONDS.sleep(1);
+  
+  				System.out.println(i);
+  			}
+  		} catch (InterruptedException e) {
+  			e.printStackTrace();
+  		} finally {
+  			lock.unlock();
+  		}
+  	}
+  
+  	/**
+  	 * ä½¿ç”¨tryLockè¿›è¡Œå°è¯•é”å®šï¼Œä¸ç®¡é”å®šä¸å¦ï¼Œæ–¹æ³•éƒ½å°†ç»§ç»­æ‰§è¡Œ
+  	 * å¯ä»¥æ ¹æ®tryLockçš„è¿”å›å€¼æ¥åˆ¤å®šæ˜¯å¦é”å®š
+  	 * ä¹Ÿå¯ä»¥æŒ‡å®štryLockçš„æ—¶é—´ï¼Œç”±äºtryLock(time)æŠ›å‡ºå¼‚å¸¸ï¼Œæ‰€ä»¥è¦æ³¨æ„unclockçš„å¤„ç†ï¼Œå¿…é¡»æ”¾åˆ°finallyä¸­
+  	 */
+  	void m2() {
+  		/*
+  		boolean locked = lock.tryLock();
+  		System.out.println("m2 ..." + locked);
+  		if(locked) lock.unlock();
+  		*/
+  		
+  		boolean locked = false;
+  		
+  		try {
+  			locked = lock.tryLock(5, TimeUnit.SECONDS);
+  			System.out.println("m2 ..." + locked);
+  		} catch (InterruptedException e) {
+  			e.printStackTrace();
+  		} finally {
+  			if(locked) lock.unlock();
+  		}
+  		
+  	}
+  
+  	public static void main(String[] args) {
+  		T03_ReentrantLock3 rl = new T03_ReentrantLock3();
+  		new Thread(rl::m1).start();
+  		try {
+  			TimeUnit.SECONDS.sleep(1);
+  		} catch (InterruptedException e) {
+  			e.printStackTrace();
+  		}
+  		new Thread(rl::m2).start();
+  	}
+  }
+  
+  ```
+
+#### LongAdder
+
+#### CountDownLatch
+
+æ‹´ä½ï¼Œlatchä¸åˆ°0ä¸è®©èµ°ã€‚
+
+```java
+package com.mashibing.juc.c_020;
+
+import java.util.concurrent.CountDownLatch;
+
+public class T06_TestCountDownLatch {
+    public static void main(String[] args) {
+        usingJoin();
+        usingCountDownLatch();
+    }
+
+    private static void usingCountDownLatch() {
+        Thread[] threads = new Thread[100];
+        CountDownLatch latch = new CountDownLatch(threads.length);
+
+        for(int i=0; i<threads.length; i++) {
+            threads[i] = new Thread(()->{
+                int result = 0;
+                for(int j=0; j<10000; j++) result += j;
+                latch.countDown();
+            });
+        }
+
+        for (int i = 0; i < threads.length; i++) {
+            threads[i].start();
+        }
+
+        //æ‹´ä½ï¼Œlatchä¸åˆ°0ä¸è®©èµ°ã€‚
+       	//å’Œè°ƒç”¨joinæ–¹æ³•ç›¸ä¼¼ï¼ˆjoinæ˜¯æŠŠä¸»çº¿ç¨‹æ”¾åœ¨æ‰€æœ‰çº¿ç¨‹ä¹‹åæ‰§è¡Œï¼‰
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("end latch");
+    }
+
+    private static void usingJoin() {
+        Thread[] threads = new Thread[100];
+
+        for(int i=0; i<threads.length; i++) {
+            threads[i] = new Thread(()->{
+                int result = 0;
+                for(int j=0; j<10000; j++) result += j;
+            });
+        }
+
+        for (int i = 0; i < threads.length; i++) {
+            threads[i].start();
+        }
+
+        for (int i = 0; i < threads.length; i++) {
+            try {
+                threads[i].join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        System.out.println("end join");
+    }
+}
+```
+
+#### CyclicBarrier
+
+* 
+
+CyclicBarrier barrier = new CyclicBarrier(20ï¼Œnew Runnable(){})
+
+â€‹	å†…éƒ¨æ˜¯é€»è¾‘ï¼Œä¸å†™çš„è¯å°±ä¸æ‰§è¡Œæ“ä½œ
+
+â€‹	
+
+æ¯æ»¡20å‘ä¸€è½¦
+
+```java
+public class T07_TestCyclicBarrier {
+    public static void main(String[] args) {
+        //CyclicBarrier barrier = new CyclicBarrier(20);
+
+        CyclicBarrier barrier = new CyclicBarrier(20, () -> System.out.println("æ»¡äºº"));
+
+        /*CyclicBarrier barrier = new CyclicBarrier(20, new Runnable() {
+            @Override
+            public void run() {
+                System.out.println("æ»¡äººï¼Œå‘è½¦");
+            }
+        });*/
+
+        for(int i=0; i<100; i++) {
+
+                new Thread(()->{
+                    try {
+                        barrier.await();
+
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (BrokenBarrierException e) {
+                        e.printStackTrace();
+                    }
+                }).start();
+        }
+    }
+}
+```
+
+#### Phaser
+
+åˆ†é˜¶æ®µçš„æ …æ 
+
+æ¶æ„03 	1ï¼š50
+
+
+
+#### å…±äº«é”å’Œæ’å®ƒé”
+
+##### è¯»é”
+
+å…è®¸å…¶å®ƒçº¿ç¨‹è¯»ï¼Œä¸è®¸å†™
+
+##### å†™é”   
+
+â€‹	è¯»é”å…±äº«ï¼Œå†™é”æ’ä»–
+
+```java
+public class T10_TestReadWriteLock {
+    static Lock lock = new ReentrantLock();
+    private static int value;
+
+    static ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+    static Lock readLock = readWriteLock.readLock();
+    static Lock writeLock = readWriteLock.writeLock();
+
+    public static void read(Lock lock) {
+        try {
+            lock.lock();
+            Thread.sleep(1000);
+            System.out.println("read over!");
+            //æ¨¡æ‹Ÿè¯»å–æ“ä½œ
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public static void write(Lock lock, int v) {
+        try {
+            lock.lock();
+            Thread.sleep(1000);
+            value = v;
+            System.out.println("write over!");
+            //æ¨¡æ‹Ÿå†™æ“ä½œ
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+
+
+    public static void main(String[] args) {
+        //Runnable readR = ()-> read(lock); ä¸ç”¨è¯»å†™é”çš„æƒ…å†µ
+        Runnable readR = ()-> read(readLock);
+
+        //Runnable writeR = ()->write(lock, new Random().nextInt());
+        Runnable writeR = ()->write(writeLock, new Random().nextInt());
+
+        for(int i=0; i<18; i++) new Thread(readR).start();
+        for(int i=0; i<2; i++) new Thread(writeR).start();
+
+
+    }
+}
+```
+
+#### Semaphore
+
+é™åˆ¶åŒæ—¶è¿è¡Œçš„çº¿ç¨‹æ•°é‡
+
+```java
+public class T11_TestSemaphore {
+    public static void main(String[] args) {
+        //Semaphore s = new Semaphore(2);
+        Semaphore s = new Semaphore(2, true);
+        //å…è®¸ä¸€ä¸ªçº¿ç¨‹åŒæ—¶æ‰§è¡Œ
+        //Semaphore s = new Semaphore(1);
+
+        new Thread(()->{
+            try {
+                //å°†ä½¿å¾—è®¾å®šçš„æ•°å­—-1ï¼Œå½“å‡ä¸º0æ—¶ï¼Œå…¶å®ƒçº¿ç¨‹æ— æ³•æ‹¿åˆ°é”
+                s.acquire();
+
+                System.out.println("T1 running...");
+                Thread.sleep(200);
+                System.out.println("T1 running...");
+
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } finally {
+                s.release();
+            }
+        }).start();
+
+        new Thread(()->{
+            try {
+                s.acquire();
+
+                System.out.println("T2 running...");
+                Thread.sleep(200);
+                System.out.println("T2 running...");
+
+                s.release();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
+}
+```
+
+#### LockSupport
+
+æ— éœ€synchronizeé”ä½æŸä¸ªç›®æ ‡ï¼ˆè°ƒç”¨waitï¼‰ï¼Œå°±å¯ä»¥å®ç°å¯¹çº¿ç¨‹çš„é˜»å¡ç­‰æ§åˆ¶
+
+LockSupport.park
+
+LockSupport.unpark (t)		
+
+unparkå¯ä»¥å…ˆäºparkè°ƒç”¨,ä¸åƒnotifyï¼Œå¿…é¡»waitä»¥åè°ƒç”¨
+
+
+
+```java
+import java.util.concurrent.locks.LockSupport;
+
+public class TestLockSupport {
+    public static void main(String[] args) {
+        Thread t = new Thread(() -> {
+            for (int i = 0; i < 10; i++) {
+                System.out.println(i);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if (i == 3){
+                    LockSupport.park();
+                }
+            }
+        });
+
+        t.start();
+//        LockSupport.unpark(t);
+
+    }
+}
+```
+
+ 
+
+#### é˜¿é‡Œé¢˜ç›®
+
+è§‚å¯Ÿè€…çº¿ç¨‹1ä¸åŠ å†…å®¹çº¿ç¨‹2 synchronizedåŒä¸€ä¸ªå¯¹è±¡ã€‚è§‚å¯Ÿè€…çº¿ç¨‹å…ˆå¯åŠ¨ï¼Œåˆ¤æ–­sizeä¸æ˜¯5ï¼Œè°ƒç”¨waitï¼Œå¦ä¸€ä¸ªçº¿ç¨‹åˆ°è¾¾5æ—¶å”¤é†’çº¿ç¨‹1ï¼ŒåŒæ—¶è‡ªå·±è°ƒç”¨waitï¼Œé‡Šæ”¾é”è®©1æ‹¿åˆ°é”ç»§ç»­èµ°æµç¨‹
+
+
+
+##### *synchronize å†™æ³•
+
+wait notifyå†™æ³•
+
+```java
+/**
+ * æ›¾ç»çš„é¢è¯•é¢˜ï¼šï¼ˆæ·˜å®ï¼Ÿï¼‰
+ * å®ç°ä¸€ä¸ªå®¹å™¨ï¼Œæä¾›ä¸¤ä¸ªæ–¹æ³•ï¼Œaddï¼Œsize
+ * å†™ä¸¤ä¸ªçº¿ç¨‹ï¼Œçº¿ç¨‹1æ·»åŠ 10ä¸ªå…ƒç´ åˆ°å®¹å™¨ä¸­ï¼Œçº¿ç¨‹2å®ç°ç›‘æ§å…ƒç´ çš„ä¸ªæ•°ï¼Œå½“ä¸ªæ•°åˆ°5ä¸ªæ—¶ï¼Œçº¿ç¨‹2ç»™å‡ºæç¤ºå¹¶ç»“æŸ
+ * 
+ * ç»™listsæ·»åŠ volatileä¹‹åï¼Œt2èƒ½å¤Ÿæ¥åˆ°é€šçŸ¥ï¼Œä½†æ˜¯ï¼Œt2çº¿ç¨‹çš„æ­»å¾ªç¯å¾ˆæµªè´¹cpuï¼Œå¦‚æœä¸ç”¨æ­»å¾ªç¯ï¼Œè¯¥æ€ä¹ˆåšå‘¢ï¼Ÿ
+ * 
+ * è¿™é‡Œä½¿ç”¨waitå’Œnotifyåšåˆ°ï¼Œwaitä¼šé‡Šæ”¾é”ï¼Œè€Œnotifyä¸ä¼šé‡Šæ”¾é”
+ * éœ€è¦æ³¨æ„çš„æ˜¯ï¼Œè¿ç”¨è¿™ç§æ–¹æ³•ï¼Œå¿…é¡»è¦ä¿è¯t2å…ˆæ‰§è¡Œï¼Œä¹Ÿå°±æ˜¯é¦–å…ˆè®©t2ç›‘å¬æ‰å¯ä»¥
+ * 
+ * é˜…è¯»ä¸‹é¢çš„ç¨‹åºï¼Œå¹¶åˆ†æè¾“å‡ºç»“æœ
+ * å¯ä»¥è¯»åˆ°è¾“å‡ºç»“æœå¹¶ä¸æ˜¯size=5æ—¶t2é€€å‡ºï¼Œè€Œæ˜¯t1ç»“æŸæ—¶t2æ‰æ¥æ”¶åˆ°é€šçŸ¥è€Œé€€å‡º
+ * æƒ³æƒ³è¿™æ˜¯ä¸ºä»€ä¹ˆï¼Ÿ
+ * 
+ * notifyä¹‹åï¼Œt1å¿…é¡»é‡Šæ”¾é”ï¼Œt2é€€å‡ºåï¼Œä¹Ÿå¿…é¡»notifyï¼Œé€šçŸ¥t1ç»§ç»­æ‰§è¡Œ
+ * æ•´ä¸ªé€šä¿¡è¿‡ç¨‹æ¯”è¾ƒç¹ç
+ * @author mashibing
+ */
+package com.mashibing.juc.c_020_01_Interview;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+
+public class T04_NotifyFreeLock {
+
+   //æ·»åŠ volatileï¼Œä½¿t2èƒ½å¤Ÿå¾—åˆ°é€šçŸ¥
+   volatile List lists = new ArrayList();
+
+   public void add(Object o) {
+      lists.add(o);
+   }
+
+   public int size() {
+      return lists.size();
+   }
+   
+   public static void main(String[] args) {
+      T04_NotifyFreeLock c = new T04_NotifyFreeLock();
+      
+      final Object lock = new Object();
+      
+      new Thread(() -> {
+         synchronized(lock) {
+            System.out.println("t2å¯åŠ¨");
+            if(c.size() != 5) {
+               try {
+                  lock.wait();
+               } catch (InterruptedException e) {
+                  e.printStackTrace();
+               }
+            }
+            System.out.println("t2 ç»“æŸ");
+            //é€šçŸ¥t1ç»§ç»­æ‰§è¡Œ
+            lock.notify();
+         }
+         
+      }, "t2").start();
+      
+      try {
+         TimeUnit.SECONDS.sleep(1);
+      } catch (InterruptedException e1) {
+         e1.printStackTrace();
+      }
+
+      new Thread(() -> {
+         System.out.println("t1å¯åŠ¨");
+         synchronized(lock) {
+            for(int i=0; i<10; i++) {
+               c.add(new Object());
+               System.out.println("add " + i);
+               
+               if(c.size() == 5) {
+                  lock.notify();
+                  //é‡Šæ”¾é”ï¼Œè®©t2å¾—ä»¥æ‰§è¡Œ
+                  try {
+                     lock.wait();
+                  } catch (InterruptedException e) {
+                     e.printStackTrace();
+                  }
+               }
+               
+               try {
+                  TimeUnit.SECONDS.sleep(1);
+               } catch (InterruptedException e) {
+                  e.printStackTrace();
+               }
+            }
+         }
+      }, "t1").start();
+   }
+}
+```
+
+##### CountDownLatchå†™æ³•
+
+ä¸¤é“é—¨æ “æ‰è¡Œï¼Œ1çº¿ç¨‹æ‰“å¼€2çš„é—¨æ “åï¼Œå…ˆäº2æ‰§è¡Œä¸‹é¢çš„é€»è¾‘
+
+ç»™1ä¹Ÿè®¾é—¨æ “ï¼Œ2æ‰§è¡Œåå†æ‰“å¼€1çš„é—¨æ “
+
+```java
+public class T05_CountDownLatch {
+
+   // æ·»åŠ volatileï¼Œä½¿t2èƒ½å¤Ÿå¾—åˆ°é€šçŸ¥
+   volatile List lists = new ArrayList();
+
+   public void add(Object o) {
+      lists.add(o);
+   }
+
+   public int size() {
+      return lists.size();
+   }
+
+   public static void main(String[] args) {
+      T05_CountDownLatch c = new T05_CountDownLatch();
+
+      CountDownLatch latch = new CountDownLatch(1);
+
+      new Thread(() -> {
+         System.out.println("t2å¯åŠ¨");
+         if (c.size() != 5) {
+            try {
+               latch.await();
+               
+               //ä¹Ÿå¯ä»¥æŒ‡å®šç­‰å¾…æ—¶é—´
+               //latch.await(5000, TimeUnit.MILLISECONDS);
+            } catch (InterruptedException e) {
+               e.printStackTrace();
+            }
+         }
+         System.out.println("t2 ç»“æŸ");
+
+      }, "t2").start();
+
+      try {
+         TimeUnit.SECONDS.sleep(1);
+      } catch (InterruptedException e1) {
+         e1.printStackTrace();
+      }
+
+      new Thread(() -> {
+         System.out.println("t1å¯åŠ¨");
+         for (int i = 0; i < 10; i++) {
+            c.add(new Object());
+            System.out.println("add " + i);
+
+            if (c.size() == 5) {
+               // æ‰“å¼€é—¨é—©ï¼Œè®©t2å¾—ä»¥æ‰§è¡Œ
+               latch.countDown();
+            }
+
+            /*try {
+               TimeUnit.SECONDS.sleep(1);
+            } catch (InterruptedException e) {
+               e.printStackTrace();
+            }*/
+         }
+
+      }, "t1").start();
+
+   }
+}
+```
+
+##### LockSupport_WithoutSleep
+
+â€‹	ç¡çœ ä¼šç»™çº¿ç¨‹2ç¼“å†²çš„æ—¶é—´
+
+```java
+public class T07_LockSupport_WithoutSleep {
+
+   // æ·»åŠ volatileï¼Œä½¿t2èƒ½å¤Ÿå¾—åˆ°é€šçŸ¥
+   volatile List lists = new ArrayList();
+
+   public void add(Object o) {
+      lists.add(o);
+   }
+
+   public int size() {
+      return lists.size();
+   }
+
+   static Thread t1 = null, t2 = null;
+
+   public static void main(String[] args) {
+      T07_LockSupport_WithoutSleep c = new T07_LockSupport_WithoutSleep();
+
+      t1 = new Thread(() -> {
+         System.out.println("t1å¯åŠ¨");
+         for (int i = 0; i < 10; i++) {
+            c.add(new Object());
+            System.out.println("add " + i);
+
+            if (c.size() == 5) {
+               LockSupport.unpark(t2);
+               LockSupport.park();
+            }
+         }
+      }, "t1");
+
+      t2 = new Thread(() -> {
+         //System.out.println("t2å¯åŠ¨");
+         //if (c.size() != 5) {
+
+            LockSupport.park();
+
+         //}
+         System.out.println("t2 ç»“æŸ");
+         LockSupport.unpark(t1);
+
+
+      }, "t2");
+
+      t2.start();
+      t1.start();
+
+
+
+
+
+   }
+}
+```
+
+##### æ¶ˆè´¹è€…é—®é¢˜
+
+```java
+/**
+ * é¢è¯•é¢˜ï¼šå†™ä¸€ä¸ªå›ºå®šå®¹é‡åŒæ­¥å®¹å™¨ï¼Œæ‹¥æœ‰putå’Œgetæ–¹æ³•ï¼Œä»¥åŠgetCountæ–¹æ³•ï¼Œ
+ * èƒ½å¤Ÿæ”¯æŒ2ä¸ªç”Ÿäº§è€…çº¿ç¨‹ä»¥åŠ10ä¸ªæ¶ˆè´¹è€…çº¿ç¨‹çš„é˜»å¡è°ƒç”¨
+ * 
+ * ä½¿ç”¨waitå’Œnotify/notifyAllæ¥å®ç°
+ * 
+ * @author mashibing
+ */
+package com.mashibing.juc.c_021_01_interview;
+
+import java.util.LinkedList;
+import java.util.concurrent.TimeUnit;
+
+public class MyContainer1<T> {
+   final private LinkedList<T> lists = new LinkedList<>();
+   final private int MAX = 10; //æœ€å¤š10ä¸ªå…ƒç´ 
+   private int count = 0;
+   
+   
+   public synchronized void put(T t) {
+      while(lists.size() == MAX) { //æƒ³æƒ³ä¸ºä»€ä¹ˆç”¨whileè€Œä¸æ˜¯ç”¨ifï¼Ÿ
+         try {
+            this.wait(); //effective java
+         } catch (InterruptedException e) {
+            e.printStackTrace();
+         }
+      }
+      
+      lists.add(t);
+      ++count;
+      this.notifyAll(); //é€šçŸ¥æ¶ˆè´¹è€…çº¿ç¨‹è¿›è¡Œæ¶ˆè´¹
+   }
+   
+   public synchronized T get() {
+      T t = null;
+      while(lists.size() == 0) {
+         try {
+            this.wait();
+         } catch (InterruptedException e) {
+            e.printStackTrace();
+         }
+      }
+      t = lists.removeFirst();
+      count --;
+      this.notifyAll(); //é€šçŸ¥ç”Ÿäº§è€…è¿›è¡Œç”Ÿäº§
+      return t;
+   }
+   
+   public static void main(String[] args) {
+      MyContainer1<String> c = new MyContainer1<>();
+      //å¯åŠ¨æ¶ˆè´¹è€…çº¿ç¨‹
+      for(int i=0; i<10; i++) {
+         new Thread(()->{
+            for(int j=0; j<5; j++) System.out.println(c.get());
+         }, "c" + i).start();
+      }
+      
+      try {
+         TimeUnit.SECONDS.sleep(2);
+      } catch (InterruptedException e) {
+         e.printStackTrace();
+      }
+      
+      //å¯åŠ¨ç”Ÿäº§è€…çº¿ç¨‹
+      for(int i=0; i<2; i++) {
+         new Thread(()->{
+            for(int j=0; j<25; j++) c.put(Thread.currentThread().getName() + " " + j);
+         }, "p" + i).start();
+      }
+   }
+}
+```
+
+##### æ¶ˆè´¹è€…2
+
+```java
+/**
+ * é¢è¯•é¢˜ï¼šå†™ä¸€ä¸ªå›ºå®šå®¹é‡åŒæ­¥å®¹å™¨ï¼Œæ‹¥æœ‰putå’Œgetæ–¹æ³•ï¼Œä»¥åŠgetCountæ–¹æ³•ï¼Œ
+ * èƒ½å¤Ÿæ”¯æŒ2ä¸ªç”Ÿäº§è€…çº¿ç¨‹ä»¥åŠ10ä¸ªæ¶ˆè´¹è€…çº¿ç¨‹çš„é˜»å¡è°ƒç”¨
+ * 
+ * ä½¿ç”¨waitå’Œnotify/notifyAllæ¥å®ç°
+ * 
+ * ä½¿ç”¨Lockå’ŒConditionæ¥å®ç°
+ * å¯¹æ¯”ä¸¤ç§æ–¹å¼ï¼ŒConditionçš„æ–¹å¼å¯ä»¥æ›´åŠ ç²¾ç¡®çš„æŒ‡å®šå“ªäº›çº¿ç¨‹è¢«å”¤é†’
+ * 
+ * @author mashibing
+ */
+package com.mashibing.juc.c_021_01_interview;
+
+import java.util.LinkedList;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+public class MyContainer2<T> {
+   final private LinkedList<T> lists = new LinkedList<>();
+   final private int MAX = 10; //æœ€å¤š10ä¸ªå…ƒç´ 
+   private int count = 0;
+   
+   private Lock lock = new ReentrantLock();
+   //Condition æœ¬è´¨å°±æ˜¯ç­‰å¾…é˜Ÿåˆ—
+   private Condition producer = lock.newCondition();
+   private Condition consumer = lock.newCondition();
+   
+   public void put(T t) {
+      try {
+         lock.lock();
+         while(lists.size() == MAX) { //æƒ³æƒ³ä¸ºä»€ä¹ˆç”¨whileè€Œä¸æ˜¯ç”¨ifï¼Ÿ
+            producer.await();
+         }
+         
+         lists.add(t);
+         ++count;
+         consumer.signalAll(); //é€šçŸ¥æ¶ˆè´¹è€…çº¿ç¨‹è¿›è¡Œæ¶ˆè´¹
+      } catch (InterruptedException e) {
+         e.printStackTrace();
+      } finally {
+         lock.unlock();
+      }
+   }
+   
+   public T get() {
+      T t = null;
+      try {
+         lock.lock();
+         while(lists.size() == 0) {
+            consumer.await();
+         }
+         t = lists.removeFirst();
+         count --;
+         producer.signalAll(); //é€šçŸ¥ç”Ÿäº§è€…è¿›è¡Œç”Ÿäº§
+      } catch (InterruptedException e) {
+         e.printStackTrace();
+      } finally {
+         lock.unlock();
+      }
+      return t;
+   }
+   
+   public static void main(String[] args) {
+      MyContainer2<String> c = new MyContainer2<>();
+      //å¯åŠ¨æ¶ˆè´¹è€…çº¿ç¨‹
+      for(int i=0; i<10; i++) {
+         new Thread(()->{
+            for(int j=0; j<5; j++) System.out.println(c.get());
+         }, "c" + i).start();
+      }
+      
+      try {
+         TimeUnit.SECONDS.sleep(2);
+      } catch (InterruptedException e) {
+         e.printStackTrace();
+      }
+      
+      //å¯åŠ¨ç”Ÿäº§è€…çº¿ç¨‹
+      for(int i=0; i<2; i++) {
+         new Thread(()->{
+            for(int j=0; j<25; j++) c.put(Thread.currentThread().getName() + " " + j);
+         }, "p" + i).start();
+      }
+   }
+}
+```
+
+### volatile
+
+å †å†…å­˜å…±äº«ï¼Œå„çº¿ç¨‹æœ‰è‡ªå·±çš„å·¥ä½œå†…å­˜ï¼Œä½¿ç”¨å †å†…å­˜å˜é‡æ—¶å…ˆå–å›è‡ªå·±çš„å·¥ä½œå†…å­˜ï¼Œæ›´æ”¹åå†™å›å †å†…å­˜çš„æ—¶é—´ä¸å¥½æ§åˆ¶ã€‚å¯¼è‡´çº¿ç¨‹ä¹‹é—´ä¸å¯è§
+
+```java
+public class T1_H {
+    /*volatile*/ static boolean time = true;
+    public void m(){
+        System.out.println("start");
+        while (time){
+
+
+        }
+        System.out.println("stop");
+    }
+
+    public static void main(String[] args) {
+        T1_H t1_h = new T1_H();
+        new Thread(t1_h::m).start();
+        try {
+            TimeUnit.SECONDS.sleep(2);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        //æ›´æ”¹äº†ä¸»çº¿ç¨‹çš„time,ä½†å¦ä¸€ä¸ªçº¿ç¨‹ä¸çŸ¥é“
+        time = false;
+    }
+
+}
+```
+
+* ä¿è¯çº¿ç¨‹å¯è§æ€§
+  * ä¸åŒçº¿ç¨‹å–åˆ°å…¬å…±å †ä¸­çš„å€¼ï¼Œå…ˆåœ¨è‡ªå·±çš„ç©ºé—´æ”¹å˜ï¼ŒåŒæ–¹æ•°æ®ä¸èƒ½åŠæ—¶å…±äº«ï¼ŒåŠä¸å¯è§
+  * ä½¿ç”¨äº†MESI ç¼“å­˜ä¸€è‡´æ€§åè®®
+* ç¦æ­¢æŒ‡ä»¤é‡æ’åº
+  * åˆ›å»ºå¯¹è±¡æµç¨‹ï¼š
+    * 1.ç”³è¯·å†…å­˜ï¼Œå¦‚ç»™aèµ‹å€¼ä¸º0ï¼Œæ­¤æ—¶ä¸ä¸ºnull
+    * 2.ç»™aèµ‹å€¼ï¼Œå¦‚a=8
+    * 3.å°†aèµ‹å€¼ç»™INSTANCE
+  * å¦‚æœå…ˆæŒ‡å‘äº†a=0ï¼Œæ­¤æ—¶ä¸æ˜¯ç©ºå€¼äº†ï¼Œå¦ä¸€ä¸ªçº¿ç¨‹å¯ä»¥æ‹¿åˆ°é”
+
+### é”ä¼˜åŒ–
+
+* é‡‡ç”¨ç»†ç²’åº¦çš„é”ï¼Œå°½é‡ä¸è¦å°†æ— éœ€é”çš„ä»£ç æ”¾å…¥å…¶ä¸­
+* å½“é”åœ¨ä¸€ç‰‡åŒºåŸŸæ¯”è¾ƒå¯†é›†çš„æ—¶å€™ï¼Œå¯ä»¥ç²—åŒ–é”
+
+
+
+* é”å®šæŸå¯¹è±¡oï¼Œå¦‚æœoçš„å±æ€§å‘ç”Ÿæ”¹å˜ï¼Œä¸å½±å“é”çš„ä½¿ç”¨ã€‚
 
 ä½†æ˜¯å¦‚æœoå˜ä¸ºå¦ä¸€ä¸ªå¯¹è±¡ï¼Œé”å°†å¤±æ•ˆï¼ˆå¦ä¸€ä¸ªå¯¹è±¡çš„å‰ä¸¤ä½ä¸ç›¸åŒï¼‰
 
 å› æ­¤åº”è¯¥	final Object o = new Object();
 
-##### é”çš„å‡çº§
 
-â€‹	é¦–å…ˆæ˜¯åå‘é”ï¼Œå¦‚æœçº¿ç¨‹äº‰ç”¨ï¼Œå‡çº§ä¸ºè‡ªæ—‹é”ï¼ˆå ç”¨cpuï¼‰
 
-â€‹	å¦ä¸€ä¸ªçº¿ç¨‹å¾ªç¯åˆ¤æ–­æ˜¯å¦èƒ½æ‹¿åˆ°é”
+### **é”çš„é€‰æ‹©**
 
-â€‹	åå‘é”ä¸æ˜¯åŠ é”ï¼Œè€Œæ˜¯è®°ä½ç¬¬ä¸€ä¸ªæ‹¿åˆ°çš„çº¿ç¨‹ï¼Œå€¾å‘äºä»–å…ˆæ‰§è¡Œ
-
-â€‹	10æ¬¡åå‡çº§ä¸ºé‡é‡çº§é”
+è‡ªæ—‹æ—¶æ˜¯å ç”¨cpuè€Œä¸å ç”¨ç³»ç»Ÿå†…æ ¸çš„ã€‚
 
 æ‰§è¡Œæ—¶é—´é•¿ï¼Œçº¿ç¨‹æ•°é‡å¤šç”¨é‡é‡çº§ï¼ˆOSï¼‰é”
 
-æ—¶é—´çŸ­ï¼Œçº¿ç¨‹æ•°é‡å°‘ç”¨è‡ªæ—‹é”
+æ—¶é—´çŸ­ï¼Œçº¿ç¨‹æ•°é‡å°‘ç”¨è‡ªæ—‹é”ï¼ˆæ¯”å¦‚1ä¸ªåœ¨æ‰§è¡Œï¼Œ999ä¸ªåœ¨è‡ªæ—‹ç­‰å¾…ï¼‰
+
+* * 
 
 
 
-#### volatile
+### é”åŸç†ï¼ˆAQSï¼‰
 
-* ä¿è¯çº¿ç¨‹å¯è§æ€§
-  * ä¸åŒçº¿ç¨‹å–åˆ°å…¬å…±å †ä¸­çš„å€¼ï¼Œå…ˆåœ¨è‡ªå·±çš„ç©ºé—´æ”¹å˜ï¼ŒåŒæ–¹æ•°æ®ä¸èƒ½åŠæ—¶å…±äº«ï¼ŒåŠä¸å¯è§
-  * MESI ç¼“å­˜ä¸€è‡´æ€§åè®®
-* ç¦æ­¢æŒ‡ä»¤é‡æ’åº
-  * ç”Ò¯OË’âOäH½&u¶Å’±¹¬éŸÉ\îFMéÍ|äÒÂ£·ÔèJŸ£ŞK‚KÅ3ìZİÿ XZıêùœòGá.üy˜Ë]=nLçëÉœß¥î>5<¿O“Ò”J*™(êó,Y%–dH (    eZ?Y¤˜Ü9ãVQ{î¡55·?’£Ö/ÜgÃ8<ã—S}¥ÏsJ¿¬e¨Ã/‰òD$êÍô7ŠQI	FˆÎÒöÜç©QÉál¾eëO…uæb+å­ìé¥ú´X­/Õ¢Æ'Ë¤x @            
-Ê¤c$ŸP‹õcÃ7í:ÊÊ)R<QÛš-gR–ÃŸ‘Ó	qA3˜ÚƒÙ£vğçIîÔÚŠËx2föÆ"6é3ØÑâi¶Û4$öX€      0©,ƒBVK*Ã(e¡É”dÃ“%ı-ãõ-7èKÉ>‹ş¾oĞ—“<}/Õ£ÓÂ÷x>©â­22W(dúZ|D¶}^Î¿ë?îßÍ!³êvqÿ Zvÿ #ô¥êâ~½^¢ââ•µV­.qæñœ¶ú½…İUJ…Ìe7Ê8i¿‰½åº»´©AÏƒc‹Áó,û=JÒæå]Ô”b¸q¹ò+æ³6ïÑd¶h¼Ec·»·R´å¤àâœÒnÁ[Oµúmä(¼¨½ä×DzmVş…¤§).òiªqñgÃìÛÎ¡Sü'óG«­\6—ƒ—J_‘JşïGNŞTiÒ‚òIÖúµÕnæ…Â•O5Ÿ,ó)­·"¾:¤¿š<Å”±}nÖØ«™ÏÉI¼Ë¿#•8rWGg©Ôì£}m/EwĞY„º¿aæìmİİä(å¤÷“]6zìàóšTuZÑ\£	%ş$oKF;GÃ/mš“óå÷â¡BŠ„§J—$—´å¡ªÙ\ÖîhÜ)TYÛgËÄ^\:]|uI?{Hó6ıòƒğ©™ŒX>å&Ó.¼TàÉ\uÏQ¨ZÆúŞQqN¬ViË®|…¥?ë*^ÿ “=&pö<İ‚PÖÕ5Ê3š_oiœw¬ü9òñÄfÇx÷—ß®ÿ  ©ü/ä|½"Ã<7u—¢¿WÕøùY¨ÉbK1{5ìôI$¶IrHóS,Ö“X÷{r`®L‘{{9ïo#iEÕe'´cÖLóÓ«:ÕeV¬³9=ıÅì/¨Õ¯;êŠápÊ…C¤WùøœÉŸO†)^¯y|>o&rß¦<CLì2S$å4zŸ=l³KgFÛïÌÉ3K_Şßx¾g<¾‰vÁúµzÂ“õ‰)'¹ñ)ê~§'¥dX¢,Ï:è‰"¬I’*@P      ¨ŸÆr¼£ZQç¹b6ÌÛMÃxMø…E5·?*¼Sd×ußm°“â“a''„Aµaq>¼³:‡ËUÈ®¤T¸wÉÉÙ` P            Æ¿¬¼ŒëGn,¾Y·…)Ôqx|ÓÊÊ9M)O‹êjÑîÍgÙ5i}hü
-Ò—{”•$ŞSÆIÛR³^û†3››ü	§MÉåò6Tâºo„ŠûÈ’K e°    ‚YÈ%hU•eŠ0Ê¬˜rdK‹Ø—ô·Ô™ú’ò<}7ˆ¾oĞ—“<t¢z¸>eàú¯Š´É#%r}M>ÖÉõ{4óª¿»4||û­Ù—ılşéüÑçä~”½\O×¯ú½6¡tììªÜFŸxé¬ğñc>óãZv§étèU²tÕI(©*œXoe¶»Z;ŠR£Z<PšÃYÆNJ:>mUU¥l”ãÉ¹7‹>E'Vz£»ôYkoIÔ{¶»¶¥yo*c•%³ëâ7Ù§J¤Zßº4}ıFú…¤ëÔk8Ä"ş´º#Çi÷ÎÂúÃËŠxš]bùş~ãÑÇ¥­ŠĞñòïJg¤ÏõzÍn.zEÂŠËI?ri³ÊØfZ…ºKwV?3ÚS©JæŠœjÒ¨¼Ô‘ÏGM°µ«ßP·Q©ºMÉ¼ydÆ,ñ“I‡NGse®JÏgKg›Ğj)êÕ¦¹Jkâ§«ê0±µ”T—Qbœzùù#ÌXŞ;+ÊuğÜbñ$º§ÌéÇÅkc´ü¹òóV¹©ğõ:´M2¼RËáâø4ÿ ÌYzWÖñ]jÇæzúUiW¥”ÜjSšÛªhÊ–ŸamUÕ·¶P©†²äŞ<²sÅ1Òk0éÈâÎl•ÉYìØó:|ÔõÕ%ÉÎm|ö5MB6ÏÒ]ìÖ)Ç®||‘ğtfÿ JĞÿ öÿ µ8ôŸ·{K—3$Nltiz™Î0ƒ”#–ßDrXê¯ÕGM8¸K}WFoq½½_à#ÊXİ»;¸VYáõf¼bÿ ÖNXpıÊZ}áèärgJÄø—İÖ­;ú
-êÓ¤±<u¸ø=t%%-§	.\Ô“<Ö¥hì¯%—N^•7â¿Ë‘êáåÜtKçıG§î×Ä°ÈÏ¼¢däú:|¯“[OÛí¾ñ|Î|ï¹½Ÿíöÿ x¾g,±øK·õjõ…%ë"Ù).gÃ§©ú¬¾•‘dQGYy—D•\Ë¨J,U$ªP@     ”s°:I¹Vbü/R\p‹ø›8EóE;•{xÜ1Ó0Îœ8ZÙ$–J³áX\Ù™ËQ0¥J™ôcÈ¥4ÜÖ<H4¢³,øñ~e° æì            (©,2½ìx°ö.<'—4—šd'‡“zâY\ÌÃÃ:ÄíÎcN˜¾(¦Iè´*TÇ¢¹œõßMï¶Ö•HÇ®äS›^60[³¢á1	3+ ¶      ‚,†TC*ËeEYVY•|ŠŠHG¨ez™¿†±ú–›ô%äxå²=|Ÿ¢ü!-_Ì¼?UôÔd6FHlúº|¶^ŞîâÎ««mS»©Œg…=½æM•É™¬LjZ­¦³¸}öƒXÿ _ô£ùõıaÿ çRşê?‘óÛ åö1ÿ ,=Äæşik^â½ÕNòâ´êÏÆO—’èP¨:Åb#PãkM§s.‹kÛ»6İ­Ä©'Î<âıÏcªzş©8ãé¶4ÖOšNLNLîaÒ¼ŒµE¥iNu'*•')Î\å'–È÷A¸ˆĞå33;–ö÷w6rnÚ¼©gœq”ıÌé¹©Ê<?H„}ªšÉÀF|LNZw0ë^FZÆ¢Ò¼ç:“u*NSœ¹ÊO,š5êÛÕZ3àœy<gyöƒ]1­9õÎú·İÚõJIÆW)§³]Üw9s¹BrJã­}0ÕòŞş©Û®–¥}Fš¥Jã†Ú)Á<!Zúêê…ÅUQAæ>‚Xø©’¥±#"wİmŸ$×¦mÙ¢dä¢'']8-“¢Çöúx¾g.N›ï¨ÿ ùœ³~œ»ñ¿V¯W’²æğiê~¯/¥d]ÄĞë/4-Ô²*‹¨J$„I%RI’  (    VrqVåƒYMx„g©óÙšÒš/N£M&ö75÷†bß-iËŠM›Ôxƒg8¬%¤:)Ã‚>Ò”©¼ñ3RZ}–±î²©õÏ‘eÈË[ @         óX“Ï‰0¨â÷İV8|^%aÆwéM5”R¥>%•Ì¥9áğ¾LØÇ‰tğÂƒ‹<ğB„¥¾>&ü)ôD—©:U5i`´ €     !K ¨©’QVU–eYa|Ê·‚Ï™IşÇêD¥è¿#ÈÔ~›=l½Wäy
-ÛThõı?Õ/Õ½5F}¤dŒ‘œ3ëéùô¶r’QYod–í•Éõ;9IVÖ)¹$Õ4çºëÓæsÉnŠM¾pÓî^)òúV=•‡©R\O~îŸO7ù•»3¦T ªÒ~1–~gN­y;6µÅ4¥8¤£ÅË-àóšwi®h×¤jºÔd¹ÆšN/İĞùFX›Ö_~õâ`˜ÅhòäÕ4ªÚ]eµ:sõ*%³ü™:^“[S¨øZ§J½F²—±x³èêúö¨éó¡ó¼Ê”8¡„Ÿÿ Y>®‰EQÒ-ÒK3~-ÿ –÷äd¦Ú5g—NF«;¯Ÿÿ Òìæ—N<3Z¯íJxùWı˜‡vêXT“’ßº©×É˜kzÕõJVöµcJ±õœ›Iõ>Ö›w+Û
-72J2’İ.YOÏ6Ï±’g´½qN.k[kŞ+O†I¦ğ=oû?¥}Šßã>¿IQÖfâ’U1</Ïùäõ­¹Y­ÓKVu·Ÿ…Ç§VJŞ7§‹±¡N¾§N…\ºr›O|‚¿gl*Q”mûÈUkĞr–V}§ÂÒŞuª_Æÿ ×²ròŞ—™ökƒLvêw„œeNr„ÓŒ¢Úiôg¬ı¥%¼+gøÒXqEj–ûF²ùKğøjOrgäM©[Vt¼^%k{Öñ½xx¹ĞnòVôbäûÇ.¯|#ïÛövÖ”bï*Î­N°¥´W³=N-'‡ôıy>qãqóÎ>MŸ^ûénÎ£²d²¶ËÇV—Vk‘šıQJÎ˜âq±Ím’ñ½{)SEÒj,Fé{c,üÏ‹ªiŸ£§ñ«N¦xZÙûÑQÖ,æ§q¸ıš´¸S÷¤*µê\U•ZÓâœ¹¿bö¸øóE¿+n~^^=©øWSû#©)ûJd”Ï~Ÿ)c¯Oı²—ñ¯™Å“³LŞòŸñ#–Ó—£‹úÕzœ’J“Gç©åúÌ¾–‘äY\‹#¼¼Ğº,T±–’‰!IT¢HD @     (©-ÑŒ©8ûQ¾VqÁbf˜‰`äÜ}¥¡K¬—¸Ó…x"FÒ+òT©Ò/ŞMIãd÷2-cİ-odF‘¸±@ eĞ         %œed!(ñG;Xx:JÎ
-K=MDé›FØÓ—ƒXxeé<K%·xf½¥±œêaâ$Ô–36ÉÕ§Ú¥—<ø„xQbL÷X@ #@     dÈeDeŠ²¢¬«,ù|ŠŠ>fs{šHÊ§2_ÃXıJÉú/ÈòW?®~ãÖIú/Èòw›\I/zşê—‡êŞŠ±ÈË+‘œŸgOÏ'9>Ïe_õ³û©|Ññ2wèw‘³Õ¨Ô©%rno¦ÏEfqZ!éâÚ+š³?/QÚOÜ•¼ãÿ r<FOĞïm!gRÚ¤œcQc‰t|ÓøŸ+OìÅ*î­ÍX],b0pÛÍŸ3‹É¦,sòûŞ&Lù¢káär{İ/÷U¯İGä|¾ÒGO´Ó¸)ÙĞ…jÏq¦“Inßáï7ìíän4¨Sâ\t=	/—òù2òrNl1xwN(ãò'ÎçO?¯¼kWqÿ µ‹@Ô´ñÜÌµ>ÎÃQºúL.UI%5(ç8Û+Ü}kjvvĞ·¤Û…5„ß_ñ9çÍKá­#Ë¯“&ù-â^k´úÚw›=KæxZî7šµJ´å˜)(Åø¥ş²{bòk5Ç$áZ-—,ÇËÆéOúò’ÿ ò?“=mzª…½JÍ6©ÁÉ¥ÍádòSş½¥÷ñ=V ÿ «®¾æö²ó#y+äÏÓæcæ>e¬*R¸£ªÑ«ü%K<ïg5}¬¶–]'üÚü~'¡g“.)Å~™{ğf®l}pñ³¹¦­Rµ<9B¬U—•ğ>ı®¿c[¿î*uŒı{ùßM«©ê•áÁN$êT|¢³ó>­~ËZV|V×’Æğ«ÿ 3èçûÔ^u:|,òkÕlq¸ÛêÑÔ{è¹R¯
-ÑäğÔ‘ğ»AeBœayoMRâ—HG–q”Ò÷3¶ÃE§¥Êu>’«Nk„p’üNNĞ×‚·§oŸNSãÇ‚I¯Äóqÿ ñçpör¿>,Û,j_$ä¢c;{OÌ.wiµÃø—Ìùù>†’ór³ÒQùœ9ÿ J^'ëUé²^Œò^Ÿ'æ~v_¬Ëéièª.v—šEŠ¢Äi(’$•J$„I       eÊEaU­¥¹«JKÂQáxf£¿g;n'n„ÓYD7„Û2§,<>¥ª½±âMwk«¶Ù=Ø5§nÖæætçµ©Ç…{Y`K›ÁÏË¯€         1©ë³c:«dË_,ÛÂ±¨×=Ñ²i¬£˜´&ãäjjÌ[å¬ ¥æg‡	¯™¬_É&w¦¦"XâS–pip¯i`ÚK,odF€Dd¥È’( 
-      †A,€ˆ|Èd²
-²Œ¹VVYÈÆ¯4nÎzÏ¿¥¬~¥&yKı®¤½ˆõ-ìymO*ò^Höı7×/Õÿ NÙ#%r2}½?9µ²U½·êFC&—o­§öšúÂš£8Ææ”vŠ›Ä¢¼3ùu;g^Pj•„!.ux—Á$yÌŒ[q0Úw0öWµé‹6¹»¯y]×¸¨çR]z%à—DM­åÅ•u^Ú£„ÖÏª’ğk©†HÉÛí×§§]¹n®½÷z(vÂ²‚U,#)uq«…ğÃ8µĞŞ_Ót£oF^´`ó)/ü•‘“x˜k;ˆzmÎÏzôÍ–RÃ^Ãïÿ ¶?³×ıoò<öFMäÁLºêXy90ï¢|º­¯­ìn•>79pç÷ŸJãµ¸·©EØ¨wqÏ{œecÀøy%øøï16•—fµÒ´g(Ê3‹á”Zi®i®Lû‘í]N¥bœ±»Up›òÁğFK“<šêƒ'.ôO—Lo®(İÎæ…GJs“msO=‰ôáÚšÊ+½³„åã
-œ+àÓ>FI~6;ú¡qòócôËíÕí5ÄáŠ6°§/µ)ñ,#åN­JÕZµ%9ÉåÉ™d”ö5<~˜g7+.o\´OÀd¦IÉßO6×â>–½Ãó‰ò²}M=ô¹ó‰çå~”½\?×«ÒÒõ_™†M¨ú¯Ìüİ<¿[—ÒÙEQdv—šE‘TXBQ$"Ä•!  (      D¢¤·—
-ÈŒ”–Ì'ù2p”^Py©-—C`k©•!O‡w»/Èr1œø¶\‰Öu´ªtÄÏyKwÌ‚ô–eŸzÔ1¹™l 9º€       ¬¬ Ï(¸¼2‰EIa˜Ê./sq;s˜Ñ	8¿a¹ÎmNY<	hZÏ²[ÂÉŒ¤äòËTyxOdV1âx,F»“;ìÒ’Ä|Ë€a¸ @     È%€Š²	deYvU†Tg=u²~K3”SM>L³™ÛŒá½Ó)],ò’ä×4}
-”Ü,ÇÄÏ':^ø­¸wÉ™««wyk½:½«mÇj+çàrdörŠ—3æ^h´kætŸu?gªıÇ×ÁÏ­»]ğy?Kµ?,}áç›ğ#&×V•í'ÃZxK£0ÉôâbÑ¸|{DÖu)`Œ‚é6 Ñ´‚F¤¤4m €4m €4mbS*24ml“œzuÍãNá‡Û—/ó>í•BÕ)c§Û—áày³r±âó=ŞÎ?.yíŸ*ÓI¯]©O4àüy¿q÷lì©ÚCæÍ’K‘9>&~]òöö~‡ÀÇƒ¿™['MâÛ¹•:M¼ËeáâtÅ)]wz2Ş'´,‹¢¨²:9,‰!E„¢Ä"H©(       $³Œqyêƒ*ÃÏCU–-ëÂJKÚXÂÆFÒx‹d˜î±;†ue¿
-3%îòmáÎs;‘&Ş¼cÂ°D`£æXÄÎÛ¬h °       Iád…R-–k+Á¬6‹¶-3ÃYæ`¤ãÈÒ5ÙìÄÆ–-‰SêŠÂ\,Ø4Ÿ46?T\™¬b¢°‰"RQBgk¤‚““y.IX€       ©bEYV\«*(Ê´]¢¬°Ë3*”T·[3vŠ´YˆŸ$L×ÃŠQp{¢¹;ZMa¬œó¡Ö?•±Ìxw®hÒÆqH8N*Q|Ó["ó³ñgg%ÿ OäÏ®ÓOaƒ¦NLSÚ\óñ1gğñµ¨Ô·¨éÖƒ„—4ÑOg^ª}İÍ58øõ^Lø—½«M:¶rïéıŸ¬¿3íàçcÉÚİ¥ùŞOÓ²âï^ğøù!§8É4×4úŸAó|$“iddhÚA6œ‚2¤¥J¥jŠ(Js|”VY÷,»9%Rş~T şoò8eÏnÒôaãäÍ:¤>Eµ¥{Êœ)¹>¯¢ógİ³Ğè[µ+†«Tğú«ó>Œ#
-TÕ:P8.J+Ÿ?Ô/~ÔíĞq¾—J~Y;ÊVI,c–Ã"1rxHŞŞ[³çÄZó·Ô›V‘¨gJon^'E:J;ó~,²E‘Ö)óÛ$Ù(º*‘t3	EˆE‘•J$‚Pi$I€         +Q´–%Ä½£I¾úRpiår!Ë1HØœà»g¥œi·ì4ŒTV%e51¹•ˆˆX«šFr“—2¥Š³6ømq7·"Å`±Æe¸ @     :‘úÈĞ$ÆÜàÒTú¢˜:mÊbahMçìj`iN]™†ë>Ë˜Î\RöMâ>fX‚Óì½.¬ĞˆG†8$Ìùj#P €     @@«,AEHeˆ**Ê²íh"hÓ4i´U¢íÑYÓ)AIa¬˜N‹[Çtu4CDšÅš­í_ˆÉÅålÎ©ÒŒù¬?¥)C~kÄãjM^šä­»K»+=EbæŸN•a³÷ø{PĞnìS«ßĞÿ ‰k¡èò^iÒyƒó]êÁÍÉ‹·˜x¹?NÅ›¼v—†ÈÊ=}æ§êY”1ipú¥èIûQæõ*÷L.)5êÔñ—¼û¸9xóxKóœ\Ş7.@W#'¯OÖr}=7A½Ô’¨£ÜĞëV¦Ëİâbù+7iÓ¦<wÉnšFåó–[ÂYlûv›¯Z*µä¾Iô~»÷t>Å¥†–¿İáßVëZ‡¬êJ¤¸¤ÛgÆä}Jg¶7Şâı'ÿ v_Ù(ÛYSîí)(.²{Ê^lœç™\šÓ¡)o/E&m|“¹îûu­1WQÙD²ğ–Y´(uŸÀÖŒ"‹¤t®8.VÍ3áŠK	`²D¤N"E’	HÊ‰H`²#Ab$ŠD"H© ’  (       •£äfMÚÊÁƒC£İ²yY$Î“|‹N\>d×v¢{"sÆË™‘#â4ÄÌÊÓ^_!7Ï‘ªXXFfVµ ]         ³(¶²"6“:jVPRó*ª>»—RLº˜MÄ³pkÈO(Ø‡ù¢õ'K9K‹¡¬•Keb>@VrÂÇQM·É¥ßu€@        †T±U¢À¨£D`»EZ£EZ4h†mÑ£EpTÒhÓ`¬¹êPŒ÷^‹9§NTŞëŞwà‡¬5”bÔ‰u®Y¯—ÎÉµ;©F•HÆ­),:sYM©jğÛØsJ2ƒÄ“Lã1jËÑ­ãNKŞÌÚßf®—S¹«ÍĞ¨ö~Oı{G³º½kŸ£ı
-¤$¦±ïäıÇ¤M§”ğÍewq8pJ´Ü|Ïv/¨æ¥z|ÿ «æåúV–êÎ[=NÒÒÃW·+§Ô‹ü×#ªµÍJïÓ{.Q\‘‰hS•Gˆ¬L™re¶í;{ñ`Å‚º¬i4§FU:ax³zvÑòôŸò7À®?”¶oåeNŒaÉeøš¤N	Hëáç™™ò„‰HœÙ£¤JE’#ZBE’	"¡"ÉE	¤$ @        ~«ò’³Û™XO3BøO,¡´–H“ây5qLpEt.ÓRÉE¾H¼i¥Ïrä9(ó&æWQ	OUÉ¾lhê† .H@ P      ¤ãÔ¸“bJy6çáhÍ§¿#DÓ[“8²L,Y©ád”ò²ŠT}Ãs=”o/,ÒšôLù›%…ƒRÅ|€.€       € ‚@EpA`ÑEHh±EpU¢ø#ÁÁfÑ4Ái¦x#øHÁSJ`¬©ÆkYFƒ<8ªY¼æ>ÆSèµsêÿ 3¿']c-¡ËNÑ-ê<ûĞ¢’ÂI"Ø'¢"<1kM¼«‚pN	ÁvÎ‘‚pY"R"é	‘8%"mL‘8'T`”‰À
-0N€@ ’  (        D½WäHÄÒ1)%‰4L¥SŞÒĞ9K/g±˜·3¤Ê~9€oNs;B9y|ˆŒ\™ªI-‰2µ€ eĞ          +('ºØ¶Rê†Sê‚N™8µÍlUÁ?a­³5V2á~ÁSÖ÷MçbTõºŞSSà„z²à–â49IçcA¢'` (        A #ˆ(¨-‚0QVˆÁa€šS`¾ÀE0FàŒSpš`Œi¥08Kà`lÒ˜/³JàœÁ8&ÅpN	Á8"£àœ$€ Á8$‚	 €H@            gÆÔŸ§1¤‰Ú³YEÒF¥%ò¹–%&=ÉË¢(YA¾e•4]Ä3©–i7È¼a¶åÒK’¥Í“kÇ GñD‘           I®¥MLä°ÍD±hšêYMu(“rÕ4ù$Úäh¤™&‰ÚH“Â$¤ù’|(kU­ŞK,Ô °            ‚@A "¸ˆ(¨Á8(®Á`J‘‚ä`
-à`¶+‚pN `°‘‚A8	Á8S                  Ÿ6^l’Ä˜‹Ä‘¯g?Ğ ÚK,ËaW4¹nUÉ²¦fÉrl`%—‚²˜Ç/ØhBXXD™™tˆĞ 
-          “X`›ƒ\·Dâ™vÄÕ˜,áàÊá®…ÚjWŒ³æV^³!<=‰õ¤{LRá, fZˆĞ
-ÎXÙVA´€€    ã¼¾­kUB…{„Öx©ğá{7g?é{Ÿì{Ïş?™¸¥¦6å9k©gwÚ>Æö¥¥uUN›Iµ®Yñöº~§m©Óu-œåõ”W¹¾gçÚõYWÖ®jN”èÊMfÆVËÀô½œÔkÛè”iÃM¹­åéÃ‡Ò~,úøu¦
-Ş¾gO™Çç^ùíKxû>–¡Ú;-2ïè×
-¯
-–c¬?y¾¬ÙêJÖU%Â·n›I{ù'´÷¹Õ»ÉÛÔ û´¸*c=wØú}”¾­k§V+
-÷ªß<a<-·büJ×#Êcç^Ü™Ç>Ÿô{¬ã++ <2¥ÚXê’Ô#mUT“Ş;pµöqG³³­V½­:•èJ…I/Jœšxg6·;‰{°r>ìÌMf4Øà¡­i÷•-!qZœ¸xe·öx˜vVZ^ø%ı=_Fšğñ~ãÃéÚeŞ©qÁo÷ôª>Qóg~?2cœ—CÍÊæÛXÇ7>ïÒk×£mIÕ¯R4àšNRxK;„áR
-p’”_&S>³g;ÊW£Rê¥ÃN•N’åì<çg»úºµjwU¨F¯§,r‹~]>,dÅl‘o—8óW×Ëô3¾«emyJÕã
-³YIò^}D×şÖ¼øÇò<& ¤µ˜Î¤ªJ5e9<·‡Ç\Ö˜êNg2ø+Óåúi>ogiÔ†BU+Î¯x—Õ^úg’ñÓi¯Ãßıt‹kÊ0	Á’„\¤ÒIe·ĞËaCUíÅÍIS´›¥EmÅ¥/nz)\İE÷ŠµU¿­ÄşgĞ§ö®í:|ÌŸR¥mªÆß¢ƒÈé=¤¯F¬i^ÍÕ¤Ş8ß­Í½5$šyO“G—6bYìÁÈ¦zî¨ÀÁ$œ^„` ù÷ÚİqjRj9XÏùg­X_UT­ë9Mı^	/Àó¯ıëOîWÍ›ö3õ÷_Ã›=óÆ§ğÿ wİñ£–yŸc¶¦uiÒIÔœ`ŸÚx&)ÔY„ã/'“ëkk«gJéG‚O	·Œ>˜öRÓî4{Î9$÷§R;e~g+›·V¥éåòïÆüºwĞAç;5­Wº¨ìîdç%(MóÛ£=%–qËŠØ­Óg§™ñÅê’¶­§Ûç¼»¤šè¥—ğGÎ¸íe…=¨Â¥gÑ¥Â¿˜®,—ñNN~«CîÒYo¹íeìö£FSäß¤ÿ ×¸ùÎ¶§«MÇµÃ[¸®KİÈõWƒ}nó“êø¢zqÄÚ^Â¾»¦ÛÕTås&ñèî—›;ã%(©E¦Ÿ&O
+
+
+### 2.3 JUC-java.util .concurrent
+
+---
+
+#### Runnableå’ŒCallable
+
+#### Executeå’ŒSubmit
+
+submitæ·»åŠ æ–°ä»»åŠ¡çš„æ–¹æ³•ä¼šæœ‰è¿”å›å€¼ï¼Œç”¨äºé€»è¾‘åˆ¤æ–­
+
+```java
+//Callableæ¥å£çš„Task
+public class testc {
+    public static void main(String[] args) {
+        ExecutorService executorService = Executors.newCachedThreadPool();
+        for(int i =0;i<10;i++){
+            Future<String> submit = executorService.submit(new Taskc());
+            String str = null;
+            try {
+                str = submit.get();
+                System.out.println(str);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+//Runnableæ¥å£çš„Task
+public class testR {
+    public static void main(String[] args) {
+        ExecutorService executorService = Executors.newCachedThreadPool();
+        for(int i =0;i<100;i++){
+            executorService.execute(new Taskr());
+        }
+        executorService.shutdown();
+
+    }
+```
+
+## é”åŸç 
+
+### è¦ç‚¹
+
+Â·è·‘ä¸èµ·æ¥ä¸è¯»
+Â·è§£å†³é—®é¢˜å°±å¥½-ç›®çš„æ€§
+Â·ä¸€æ¡çº¿ç´¢åˆ°åº•
+Â·æ— å…³ç»†èŠ‚ç•¥è¿‡
+Â·ä¸€èˆ¬ä¸è¯»é™æ€
+Â·ä¸€èˆ¬åŠ¨æ€è¯»æ³•
+
+
+
+æ¨¡æ¿æ–¹æ³•ï¼šçˆ¶ç±»åªæä¾›æ–¹æ³•ï¼Œå­ç±»å»å®ç°ç»†èŠ‚
+
+
+
+### AQS
+
+casæ“ä½œtail
+
+![AQS](E:\deng\deng\MD\image\AQS.png)
+
+stateæ˜¯ä¸€ä¸ªvolatleçš„intç±»å‹ï¼Œç”¨äºåˆ¤æ–­æ˜¯å¦åŠ é”ï¼Œå¹¶ä¸”è®¾ç½®stateçš„æ–¹æ³•é™¤äº†æœ‰setState,è¿˜æœ‰compareAndSetState
+
+å†…éƒ¨ç»´æŠ¤ä¸€ä¸ªçº¿ç¨‹é˜Ÿåˆ—
+
+å¦‚æœc == 0 ,é€šè¿‡caså°†å…¶å˜ä¸º1
+
+
+
+==é«˜å¹¶å‘5 20:00
+
+#### VarHandle
+
+1.æ™®é€šå±æ€§è¿›è¡ŒåŸå­æ“ä½œ
+
+2.æ¯”åå°„å¿«ï¼Œç›´æ¥æ“çºµäºŒè¿›åˆ¶ç 
+
+
+
+### ThreadLocal
+
+çº¿ç¨‹ç‹¬æœ‰
+
+* setæ–¹æ³•
+  * Thread.currentThread.map.set(ThreadLocal,value)
+  * è®¾ç½®åˆ°äº†å½“å‰çº¿ç¨‹çš„mapä¸­ï¼Œæ‰€ä»¥å¦ä¸€ä¸ªçº¿ç¨‹getä¸åˆ°
+* åœ¨å£°æ˜å¼äº‹åŠ¡ä¸­
+  * ç¬¬ä¸€ä¸ªæ‹¿åˆ°connectionåï¼Œæ”¾å…¥ThreadLocalä¸­ï¼Œåç»­çš„ä»localæ‹¿ï¼Œè¿™æ ·ä¸ä¼šä½¿å¾—æ‹¿åˆ°ä¸åŒçš„connectionã€‚
+
+* mapä¸­çš„keyæ˜¯å¼±å¼•ç”¨ï¼Œvalueæ˜¯å¼ºå¼•ç”¨
+  * å½“tlå¯¹ThreadLocalçš„å¼•ç”¨æ¶ˆå¤±æ—¶ï¼Œkeyçš„å¼•ç”¨ä¼šè‡ªåŠ¨æ¶ˆå¤±ï¼Œå¦åˆ™ä¼šé€ æˆå†…å­˜æ³„éœ²
+  * å³ä¾¿å¦‚æ­¤è¿˜è¿˜ä¼šæœ‰å†…å­˜æ³„éœ²ï¼ˆå¦‚ä¸‹å›¾ï¼‰ï¼Œå› æ­¤ä¸ç”¨çš„æ—¶å€™è¦remove()æ‰
+
+![å¼±å¼•ç”¨](E:\deng\deng\MD\image\å¼±å¼•ç”¨.png)
+
+```java
+/**
+ * ThreadLocalçº¿ç¨‹å±€éƒ¨å˜é‡
+ *
+ * ThreadLocalæ˜¯ä½¿ç”¨ç©ºé—´æ¢æ—¶é—´ï¼Œsynchronizedæ˜¯ä½¿ç”¨æ—¶é—´æ¢ç©ºé—´
+ * æ¯”å¦‚åœ¨hibernateä¸­sessionå°±å­˜åœ¨ä¸ThreadLocalä¸­ï¼Œé¿å…synchronizedçš„ä½¿ç”¨
+ *
+ * è¿è¡Œä¸‹é¢çš„ç¨‹åºï¼Œç†è§£ThreadLocal
+ * 
+ * @author é©¬å£«å…µ
+ */
+package com.mashibing.juc.c_022_RefTypeAndThreadLocal;
+
+import java.util.concurrent.TimeUnit;
+
+public class ThreadLocal2 {
+   //volatile static Person p = new Person();
+   static ThreadLocal<Person> tl = new ThreadLocal<>();
+   
+   public static void main(String[] args) {
+            
+      new Thread(()->{
+         try {
+            TimeUnit.SECONDS.sleep(2);
+         } catch (InterruptedException e) {
+            e.printStackTrace();
+         }
+         
+         System.out.println(tl.get());
+      }).start();
+      
+      new Thread(()->{
+         try {
+            TimeUnit.SECONDS.sleep(1);
+         } catch (InterruptedException e) {
+            e.printStackTrace();
+         }
+         tl.set(new Person());
+      }).start();
+   }
+   
+   static class Person {
+      String name = "zhangsan";
+   }
+}
+```
+
+
+
+
+
+## å¼•ç”¨
+
+### å¼ºå¼•ç”¨
+
+æ™®é€šå¼•ç”¨
+
+
+
+```java
+public class T01_NormalReference {
+    public static void main(String[] args) throws IOException {
+        M m = new M();
+        m = null;
+        System.gc(); //DisableExplicitGC
+
+        System.in.read();
+    }
+}
+```
+
+### è½¯å¼•ç”¨
+
+åšç¼“å­˜ç”¨(é¢è¯•ç”¨ï¼‰
+
+å†…å­˜å¤Ÿæ—¶å°±æ”¾é‚£ï¼Œä¸å¤Ÿå†gcå›æ”¶
+
+```java
+/**
+ * è½¯å¼•ç”¨
+ * è½¯å¼•ç”¨æ˜¯ç”¨æ¥æè¿°ä¸€äº›è¿˜æœ‰ç”¨ä½†å¹¶éå¿…é¡»çš„å¯¹è±¡ã€‚
+ * å¯¹äºè½¯å¼•ç”¨å…³è”ç€çš„å¯¹è±¡ï¼Œåœ¨ç³»ç»Ÿå°†è¦å‘ç”Ÿå†…å­˜æº¢å‡ºå¼‚å¸¸ä¹‹å‰ï¼Œå°†ä¼šæŠŠè¿™äº›å¯¹è±¡åˆ—è¿›å›æ”¶èŒƒå›´è¿›è¡Œç¬¬äºŒæ¬¡å›æ”¶ã€‚
+ * å¦‚æœè¿™æ¬¡å›æ”¶è¿˜æ²¡æœ‰è¶³å¤Ÿçš„å†…å­˜ï¼Œæ‰ä¼šæŠ›å‡ºå†…å­˜æº¢å‡ºå¼‚å¸¸ã€‚
+ * -Xmx20M
+ */
+package com.mashibing.juc.c_022_RefTypeAndThreadLocal;
+
+import java.lang.ref.SoftReference;
+
+public class T02_SoftReference {
+    public static void main(String[] args) {
+        SoftReference<byte[]> m = new SoftReference<>(new byte[1024*1024*10]);
+        //m = null;
+        System.out.println(m.get());
+        System.gc();
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println(m.get());
+
+        //å†åˆ†é…ä¸€ä¸ªæ•°ç»„ï¼Œheapå°†è£…ä¸ä¸‹ï¼Œè¿™æ—¶å€™ç³»ç»Ÿä¼šåƒåœ¾å›æ”¶ï¼Œå…ˆå›æ”¶ä¸€æ¬¡ï¼Œå¦‚æœä¸å¤Ÿï¼Œä¼šæŠŠè½¯å¼•ç”¨å¹²æ‰
+        byte[] b = new byte[1024*1024*15];
+        System.out.println(m.get());
+    }
+}
+
+//è½¯å¼•ç”¨éå¸¸é€‚åˆç¼“å­˜ä½¿ç”¨
+```
+
+### å¼±å¼•ç”¨
+
+ä¸€èˆ¬ç”¨åœ¨å®¹å™¨ä¸­ï¼Œå’Œå¼ºå¼•ç”¨æŒ‡å‘åŒä¸€å¯¹è±¡ï¼Œå¼ºå¼•ç”¨æ¶ˆå¤±æ—¶ï¼Œå¼±å¼•ç”¨ä¸€å¹¶å›æ”¶
+
+ç›´æ¥å¹²æ‰
+
+
+
+### è™šå¼•ç”¨
+
+é«˜å¹¶å‘5 2h
+
+ç®¡ç†å¯¹å¤–å†…å­˜ï¼Œå¯¹è°ƒç”¨apiçš„äººæ— æ„ä¹‰ï¼Œå› æ­¤getä¸ºnull;
+
+## çº¿ç¨‹æ± 
+
+#### Callable
+
+ä¸Runnableç±»ä¼¼ï¼Œä½†callableæœ‰è¿”å›å€¼
+
+åªèƒ½æ‰§è¡Œä»»åŠ¡ï¼Œè¿”å›å€¼éœ€è¦å­˜å‚¨åœ¨Futureä¸­
+
+```java
+public class T03_Callable {
+    public static void main(String[] args) throws ExecutionException, InterruptedException {
+        Callable<String> c = new Callable() {
+            @Override
+            public String call() throws Exception {
+                return "Hello Callable";
+            }
+        };
+        //å°†callableæ‰”è¿›ä¸‹é¢è¿™ä¸ªçº¿ç¨‹æ± 
+        ExecutorService service = Executors.newCachedThreadPool();
+        Future<String> future = service.submit(c); //å¼‚æ­¥
+
+        //lamdaå†™æ³•
+        Future<Integer> future2 = service.submit(()->{
+            TimeUnit.MILLISECONDS.sleep(500);
+            return 1;
+        }); //å¼‚æ­¥
+
+        System.out.println(future.get());//é˜»å¡
+
+        service.shutdown();
+    }
+
+}
+```
+
+#### FutureTask
+
+æ—¢æ˜¯Runnableåˆæ˜¯Future
+
+æ—¢èƒ½æ‰§è¡Œï¼Œåˆèƒ½å­˜å‚¨ç»“æœ
+
+æ˜¯ä¸ªå¼‚æ­¥æ“ä½œ
+
+```java
+public class T06_00_Future {
+   public static void main(String[] args) throws InterruptedException, ExecutionException {
+      FutureTask<Integer> task = new FutureTask<>(()->{
+         TimeUnit.MILLISECONDS.sleep(500);
+         return 500;
+      });
+      new Thread(task).start();
+      System.out.println(task.get());
+   }
+}
+```
+
+#### ==CompletableFuture
+
+å¯¹äºå¤šä¸ªFutureçš„ç®¡ç†
+
+allOf(A,B,C)	
+
+```java
+/**
+ * å‡è®¾ä½ èƒ½å¤Ÿæä¾›ä¸€ä¸ªæœåŠ¡
+ * è¿™ä¸ªæœåŠ¡æŸ¥è¯¢å„å¤§ç”µå•†ç½‘ç«™åŒä¸€ç±»äº§å“çš„ä»·æ ¼å¹¶æ±‡æ€»å±•ç¤º
+ * @author é©¬å£«å…µ http://mashibing.com
+ */
+
+package com.mashibing.juc.c_026_01_ThreadPool;
+
+import java.io.IOException;
+import java.util.Random;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+
+public class T06_01_CompletableFuture {
+    public static void main(String[] args) throws ExecutionException, InterruptedException {
+        long start, end;
+
+        /*start = System.currentTimeMillis();
+
+        priceOfTM();
+        priceOfTB();
+        priceOfJD();
+
+        end = System.currentTimeMillis();
+        System.out.println("use serial method call! " + (end - start));*/
+
+        start = System.currentTimeMillis();
+
+        //æ‰§è¡Œå¼‚æ­¥ä»»åŠ¡ã€‚ 
+        CompletableFuture<Double> futureTM = CompletableFuture.supplyAsync(()->priceOfTM());
+        CompletableFuture<Double> futureTB = CompletableFuture.supplyAsync(()->priceOfTB());
+        CompletableFuture<Double> futureJD = CompletableFuture.supplyAsync(()->priceOfJD());
+
+        //å¿…é¡»ä¸‹é¢ä¸‰ä¸ªä»»åŠ¡éƒ½å®Œæˆï¼Œæ‰è¾“å‡ºç»“æœ
+        CompletableFuture.allOf(futureTM, futureTB, futureJD).join();
+
+        CompletableFuture.supplyAsync(()->priceOfTM())
+                .thenApply(String::valueOf)
+                .thenApply(str-> "price " + str)
+                .thenAccept(System.out::println);
+
+
+        end = System.currentTimeMillis();
+        System.out.println("use completable future! " + (end - start));
+
+        try {
+            System.in.read();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //æ¨¡æ‹Ÿå»å…¶ä»–ç½‘ç«™çˆ¬è™«çš„æ—¶é—´ï¼Œè¿”å›ä»·æ ¼
+    private static double priceOfTM() {
+        delay();
+        return 1.00;
+    }
+
+    private static double priceOfTB() {
+        delay();
+        return 2.00;
+    }
+
+    private static double priceOfJD() {
+        delay();
+        return 3.00;
+    }
+
+    /*private static double priceOfAmazon() {
+        delay();
+        throw new RuntimeException("product not exist!");
+    }*/
+    
+
+    private static void delay() {
+        int time = new Random().nextInt(500);
+        try {
+            TimeUnit.MILLISECONDS.sleep(time);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.printf("After %s sleep!\n", time);
+    }
+}
+```
+
+
+
+### ThreadPoolExecutor
+
+é‡Œé¢æ”¾ç½®ç€å„ä¸ªçº¿ç¨‹å’Œå„ä¸ªä»»åŠ¡ï¼Œå„ä¸ªçº¿ç¨‹å»åŒä¸€ä¸ªé˜Ÿåˆ—æ‹¿ä»»åŠ¡
+
+![ThreadPoolåŸç†](E:\deng\deng\MD\image\ThreadPoolåŸç†.png)
+
+çº¿ç¨‹æ± çš„æ‰§è¡Œå™¨
+
+~~~java
+public ThreadPoolExecutor(int corePoolSize,  
+                          int maximumPoolSize,  
+                          long keepAliveTime,  
+                          TimeUnit unit,  
+                          BlockingQueue<Runnable> blockingQueue,  
+                          ThreadFactory threadFactory,  
+                          RejectedExecutionHandler handler)
+~~~
+
+**corePoolSize**ï¼šå°±æ˜¯çº¿ç¨‹æ± ä¸­çš„æ ¸å¿ƒçº¿ç¨‹æ•°é‡ 
+
+**maximumPoolSize**ï¼šå°±æ˜¯çº¿ç¨‹æ± ä¸­å¯ä»¥å®¹çº³çš„æœ€å¤§çº¿ç¨‹çš„æ•°é‡
+
+**keepAliveTime**ï¼šçº¿ç¨‹æ± ä¸­é™¤äº†æ ¸å¿ƒçº¿ç¨‹ä¹‹å¤–çš„å…¶ä»–çš„æœ€é•¿å¯ä»¥ä¿ç•™çš„æ—¶é—´
+
+**TimeUnit.SECONDS**ï¼šæ—¶é—´å•ä½
+
+**workQueue**ï¼šä»»åŠ¡é˜Ÿåˆ—ï¼Œä»»åŠ¡å¯ä»¥å‚¨å­˜åœ¨ä»»åŠ¡é˜Ÿåˆ—ä¸­ç­‰å¾…è¢«æ‰§è¡Œ
+
+**threadFactory**ï¼šå°±æ˜¯åˆ›å»ºçº¿ç¨‹çš„çº¿ç¨‹å·¥å‚
+
+**handler**ï¼šæ‹’ç»ç­–ç•¥
+
+
+
+![ä¸ºä»€ä¹ˆè¦çº¿ç¨‹æ± ](E:\deng\image\ä¸ºä»€ä¹ˆè¦çº¿ç¨‹æ± .png)
+
+![çº¿ç¨‹æ± å·¥ä½œåŸç†](E:\deng\image\çº¿ç¨‹æ± å·¥ä½œåŸç†.png)
+
+
+
+
+
+### Executors-çº¿ç¨‹æ± çš„å·¥å‚
+
+
+
+### è‡ªä¹‰çº¿ç¨‹æ± 
+
+ä¼°ç®—åå†å‹æµ‹ï¼Œç¡®å®šå…·ä½“è®¾å®š
+
+![è°ƒæ•´çº¿ç¨‹æ± å¤§å°](E:\deng\deng\MD\image\è°ƒæ•´çº¿ç¨‹æ± å¤§å°.png)
+
+
+
+```java
+public class è‡ªå®šä¹‰çº¿ç¨‹æ±  {
+    public static void main(String[] args) {
+        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(2,5,60, TimeUnit.SECONDS,new ArrayBlockingQueue(5));
+                                    //åªç”¨ä¸€æ¬¡çš„å†…éƒ¨ç±»
+        threadPoolExecutor.submit(new Callable<Integer>() {
+            @Override
+            public Integer call() throws Exception {
+                System.out.println(Math.random());
+                return null;
+            }
+        });
+    }
+}
+```
+
+### åŠŸèƒ½çº¿ç¨‹æ± 
+
+ä¸å»ºè®®ä½¿ç”¨ï¼Œå› ä¸ºLinkedBlockingQueueæœ‰ä¸Šç•Œï¼Œå¯¼è‡´OOM
+
+è¿˜æœ‰è¦è‡ªå®šä¹‰çº¿ç¨‹çš„åç§°ï¼Œæ–¹ä¾¿æ’æŸ¥é—®é¢˜
+
+
+
+**FixedThreadPool**
+
+- **ç‰¹ç‚¹**ï¼šåªæœ‰æ ¸å¿ƒçº¿ç¨‹ï¼Œçº¿ç¨‹æ•°é‡å›ºå®šï¼Œæ‰§è¡Œå®Œç«‹å³å›æ”¶ï¼Œä»»åŠ¡é˜Ÿåˆ—ä¸ºé“¾è¡¨ç»“æ„çš„æœ‰ç•Œé˜Ÿåˆ—ã€‚
+- **åº”ç”¨åœºæ™¯**ï¼šæ§åˆ¶çº¿ç¨‹æœ€å¤§å¹¶å‘æ•°ã€‚
+
+**CachedThreadPool:**	å¯ç¼“å­˜çš„çº¿ç¨‹æ± 
+
+- **ç‰¹ç‚¹**ï¼šæ— æ ¸å¿ƒçº¿ç¨‹ï¼Œéæ ¸å¿ƒçº¿ç¨‹æ•°é‡æ— é™ï¼Œæ‰§è¡Œå®Œé—²ç½®60såå›æ”¶ï¼Œä»»åŠ¡é˜Ÿåˆ—ä¸ºä¸å­˜å‚¨å…ƒç´ çš„é˜»å¡é˜Ÿåˆ—ã€‚SynchronousQueue
+- **åº”ç”¨åœºæ™¯**ï¼šæ‰§è¡Œå¤§é‡ã€è€—æ—¶å°‘çš„ä»»åŠ¡ã€‚4444
+
+**SecudleThreadPool:**
+
+- **ç‰¹ç‚¹**ï¼šæ ¸å¿ƒçº¿ç¨‹æ•°é‡å›ºå®šï¼Œéæ ¸å¿ƒçº¿ç¨‹æ•°é‡æ— é™ï¼Œæ‰§è¡Œå®Œé—²ç½®10msåå›æ”¶ï¼Œä»»åŠ¡é˜Ÿåˆ—ä¸ºå»¶æ—¶é˜»å¡é˜Ÿåˆ—ã€‚
+- **åº”ç”¨åœºæ™¯**ï¼šæ‰§è¡Œå®šæ—¶æˆ–å‘¨æœŸæ€§çš„ä»»åŠ¡ã€‚
+
+**SingleThreadPool:**	
+
+- **ç‰¹ç‚¹**ï¼šåªæœ‰1ä¸ªæ ¸å¿ƒçº¿ç¨‹ï¼Œæ— éæ ¸å¿ƒçº¿ç¨‹ï¼Œæ‰§è¡Œå®Œç«‹å³å›æ”¶ï¼Œä»»åŠ¡é˜Ÿåˆ—ä¸ºé“¾è¡¨ç»“æ„çš„æœ‰ç•Œé˜Ÿåˆ—ã€‚
+- **åº”ç”¨åœºæ™¯**ï¼šä¸é€‚åˆå¹¶å‘ä½†å¯èƒ½å¼•èµ·IOé˜»å¡æ€§åŠå½±å“UIçº¿ç¨‹å“åº”çš„æ“ä½œï¼Œå¦‚æ•°æ®åº“æ“ä½œã€æ–‡ä»¶æ“ä½œç­‰
+
+![img](https://img-blog.csdnimg.cn/20190721095954211.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTM1NDExNDA=,size_16,color_FFFFFF,t_70)
+
+
+
+åä¸‰ç§æ–¹æ³•å®é™…ä¸Šåªæ˜¯ExecutorServiceçš„ä¸åŒæ„é€ æ–¹æ³•
+
+ExecutorServiceç»§æ‰¿è‡ªExecutor
+
+ThreadPoolExecutorå®ç°äº†ExecutorServiceæ¥å£
+
+![çº¿ç¨‹æ± åˆ†ç±»](E:\ç¼–ç¨‹\image\çº¿ç¨‹æ± åˆ†ç±».png)
+
+Executors.newCachedThreadPool
+
+```java
+//newScheduledThreadPoolçº¿ç¨‹æ± 
+public class ScheduledDemo {
+    public static void main(String[] args) {
+        ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(3);
+        System.out.println(System.currentTimeMillis());
+        //åˆ›å»ºå†…éƒ¨ç±»
+        scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                System.out.println("å»¶è¿Ÿ3ç§’");
+                System.out.println(System.currentTimeMillis());
+            }
+            //å»¶æ—¶1ç§’ï¼Œ3ç§’æ‰§è¡Œä¸€æ¬¡
+        },1,3, TimeUnit.SECONDS);
+//        scheduledExecutorService.shutdown();
+        System.out.println(System.currentTimeMillis());
+    }
+}
+```
+
+çº¿ç¨‹æ± çš„ç”Ÿå‘½å‘¨æœŸ
+
+![çº¿ç¨‹æ± çš„ç”Ÿå‘½å‘¨æœŸ](E:\deng\image\çº¿ç¨‹æ± çš„ç”Ÿå‘½å‘¨æœŸ.png)
+
+![çº¿ç¨‹æ± çš„ç”Ÿå‘½å‘¨æœŸ2](E:\deng\image\çº¿ç¨‹æ± çš„ç”Ÿå‘½å‘¨æœŸ2.png)
+
+### æ‹’ç»ç­–ç•¥
+
+ä»¥ä¸‹æ˜¯é»˜è®¤ç­–ç•¥ï¼Œå®é™…ä¸€èˆ¬ä¸ç”¨ï¼Œç”¨è‡ªå®šä¹‰çš„
+
+**AbortPolicy:**ä¸æ‰§è¡Œæ–°ä»»åŠ¡ï¼Œç›´æ¥æŠ›å‡ºå¼‚å¸¸ï¼Œæç¤ºçº¿ç¨‹æ± å·²æ»¡
+
+**DisCardPolicy:**ä¸æ‰§è¡Œæ–°ä»»åŠ¡ï¼Œä¹Ÿä¸æŠ›å‡ºå¼‚å¸¸
+
+**DisCardOldSetPolicy:**å°†æ’é˜Ÿæ—¶é—´æœ€ä¹…çš„ï¼ˆç¬¬ä¸€ä¸ªï¼‰æ›¿æ¢ä¸ºå½“å‰æ–°è¿›æ¥çš„ä»»åŠ¡æ‰§è¡Œ
+
+**CallerRunsPolicy:**ç›´æ¥è°ƒç”¨executeæ¥æ‰§è¡Œå½“å‰ä»»åŠ¡
+
+##### Executeæ–¹æ³•æ‰§è¡Œé€»è¾‘
+
+![Executeæ–¹æ³•æ‰§è¡Œé€»è¾‘](E:\deng\image\Executeæ–¹æ³•æ‰§è¡Œé€»è¾‘.png)
+
+
+
+
+
+## ForkJoinPool
+
+è¿™æ˜¯ä¸€ä¸ªçº¿ç¨‹æ± ï¼Œä»»åŠ¡éœ€è¦æ‰”è¿›å»ï¼Œfjp.execute(task)
+
+å¤§ä»»åŠ¡åˆ†æ•£åæ±‡æ€»ä»»åŠ¡
+
+RecursiveAction
+
+#### åŸç†
+
+æ¯ä¸ªçº¿ç¨‹ç»´æŠ¤è‡ªå·±çš„é˜Ÿåˆ—ï¼Œæ‰§è¡Œå®Œå°±å»å…¶å®ƒé˜Ÿåˆ—å°¾éƒ¨æ‹¿
+
+çº¿ç¨‹æ‰§è¡Œè‡ªå·±çš„ä»»åŠ¡æ—¶ä¸éœ€è¦åŠ é”ï¼Œè€Œæ‰§è¡Œå…¶å®ƒçº¿ç¨‹ä»»åŠ¡æ—¶éœ€è¦åŠ é”
+
+![forkjoinåŸç†](E:\deng\deng\MD\image\forkjoinåŸç†.png)
+
+#### ForkJoinPool
+
+åŠ æ€»ä¸€ä¸ªæ•°ç»„çš„æ€»å’Œï¼Œç”¨forkjoin
+
+åˆ›å»ºä¸€ä¸ªåŠ æ€»ä»»åŠ¡ç»§æ‰¿RecursiveTask<Long> ï¼ˆå¸¦è¿”å›å€¼ï¼‰
+
+```java
+
+package com.mashibing.juc.c_026_01_ThreadPool;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Random;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.RecursiveAction;
+import java.util.concurrent.RecursiveTask;
+
+public class T12_ForkJoinPool {
+   static int[] nums = new int[1000000];
+   //æ¯ä¸ªçº¿ç¨‹è®¡ç®—çš„æœ€å¤§æ•°é‡
+   static final int MAX_NUM = 50000;
+   static Random r = new Random();
+   
+   static {
+      for(int i=0; i<nums.length; i++) {
+         nums[i] = r.nextInt(100);
+      }
+      
+      System.out.println("---" + Arrays.stream(nums).sum()); //stream api
+   }
+   
+
+   static class AddTask extends RecursiveAction {
+
+      int start, end;
+
+      AddTask(int s, int e) {
+         start = s;
+         end = e;
+      }
+
+      @Override
+      protected void compute() {
+
+         if(end-start <= MAX_NUM) {
+            long sum = 0L;
+            for(int i=start; i<end; i++) sum += nums[i];
+            System.out.println("from:" + start + " to:" + end + " = " + sum);
+         } else {
+
+            int middle = start + (end-start)/2;
+
+            AddTask subTask1 = new AddTask(start, middle);
+            AddTask subTask2 = new AddTask(middle, end);
+            subTask1.fork();
+            subTask2.fork();
+         }
+
+
+      }
+
+   }
+
+   
+   static class AddTaskRet extends RecursiveTask<Long> {
+      
+      private static final long serialVersionUID = 1L;
+      int start, end;
+      
+      AddTaskRet(int s, int e) {
+         start = s;
+         end = e;
+      }
+
+      @Override
+      protected Long compute() {
+         
+         if(end-start <= MAX_NUM) {
+            long sum = 0L;
+            for(int i=start; i<end; i++) sum += nums[i];
+            return sum;
+         } 
+         
+         int middle = start + (end-start)/2;
+         
+         AddTaskRet subTask1 = new AddTaskRet(start, middle);
+         AddTaskRet subTask2 = new AddTaskRet(middle, end);
+         subTask1.fork();
+         subTask2.fork();
+         
+         return subTask1.join() + subTask2.join();
+      }
+      
+   }
+   
+   public static void main(String[] args) throws IOException {
+      /*ForkJoinPool fjp = new ForkJoinPool();
+      AddTask task = new AddTask(0, nums.length);
+      fjp.execute(task);*/
+
+      T12_ForkJoinPool temp = new T12_ForkJoinPool();
+
+      ForkJoinPool fjp = new ForkJoinPool();
+      AddTaskRet task = new AddTaskRet(0, nums.length);
+      fjp.execute(task);
+      long result = task.join();
+      System.out.println(result);
+      
+      //System.in.read();
+      
+   }
+}
+```
+
+#### ParallelStramAPI
+
+```JAVA
+package com.mashibing.juc.c_026_01_ThreadPool;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+public class T13_ParallelStreamAPI {
+   public static void main(String[] args) {
+      List<Integer> nums = new ArrayList<>();
+      Random r = new Random();
+      for(int i=0; i<10000; i++) nums.add(1000000 + r.nextInt(1000000));
+      
+      //System.out.println(nums);
+      
+      long start = System.currentTimeMillis();
+      nums.forEach(v->isPrime(v));
+      long end = System.currentTimeMillis();
+      System.out.println(end - start);
+      
+      //ä½¿ç”¨parallel stream api
+      
+      start = System.currentTimeMillis();
+      nums.parallelStream().forEach(T13_ParallelStreamAPI::isPrime);
+      end = System.currentTimeMillis();
+      
+      System.out.println(end - start);
+   }
+   
+   static boolean isPrime(int num) {
+      for(int i=2; i<=num/2; i++) {
+         if(num % i == 0) return false;
+      }
+      return true;
+   }
+}
+```
+
+
+
+
+
+## å®¹å™¨
+
+![å®¹å™¨](E:\deng\deng\MD\image\å®¹å™¨.png)
+
+Queueæ˜¯ä¸ºäº†é«˜å¹¶å‘å‡†å¤‡çš„
+
+Vector Hashtable è‡ªå¸¦é”ï¼Œä½†ç°åœ¨ä¸ç”¨
+
+T023 FromHashtableToCHM
+
+### å®¹å™¨å†å²
+
+* hashtable åŠ é” 
+
+* hashmap å»é™¤é”ï¼Œå¢åŠ æ•ˆç‡
+
+* synchronizeHashMap	å¢åŠ é”
+
+* concurrentHashMap	å¤šçº¿ç¨‹ä¸“ç”¨
+  * ä½†æ˜¯æ²¡æœ‰concurrentTreeMap,å› ä¸ºæ ‘å®ç°caså¤ªå¤æ‚äº†
+  * ä½†åˆéœ€è¦ä¸€ä¸ªæ’å¥½åºçš„å®¹å™¨ï¼Œå› æ­¤äº§ç”Ÿäº† å¦‚ä¸‹
+* concurrentSkipListMap è·³è¡¨
+  * ![è·³è¡¨](E:\deng\deng\MD\image\è·³è¡¨.png)
+
+
+
+queueå’ŒliståŒºåˆ«
+
+* queueå’Œlistçš„åŒºåˆ«å°±ä½“ç°åœ¨è¿™é‡Œ
+  queueæä¾›äº†è¿™äº›å¯¹å¤šçº¿ç¨‹å‹å¥½çš„æ“ä½œ
+
+
+
+#### æ€§èƒ½æµ‹è¯•demo
+
+```java
+package com.mashibing.juc.c_023_02_FromHashtableToCHM;
+
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+
+public class T04_TestConcurrentHashMap {
+
+    static Map<UUID, UUID> m = new ConcurrentHashMap<>();
+
+    static int count = Constants.COUNT;
+    static UUID[] keys = new UUID[count];
+    static UUID[] values = new UUID[count];
+    static final int THREAD_COUNT = Constants.THREAD_COUNT;
+
+    
+    //å…ˆæ•´å¥½kvé”®å€¼å¯¹
+    static {
+        for (int i = 0; i < count; i++) {
+            keys[i] = UUID.randomUUID();
+            values[i] = UUID.randomUUID();
+        }
+    }
+
+    static class MyThread extends Thread {
+        int start;
+        int gap = count/THREAD_COUNT;
+
+        public MyThread(int start) {
+            this.start = start;
+        }
+
+        @Override
+        public void run() {
+            for(int i=start; i<start+gap; i++) {
+                m.put(keys[i], values[i]);
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+
+        long start = System.currentTimeMillis();
+
+        Thread[] threads = new Thread[THREAD_COUNT];
+
+        for(int i=0; i<threads.length; i++) {
+            threads[i] =
+            new MyThread(i * (count/THREAD_COUNT));
+        }
+
+        for(Thread t : threads) {
+            t.start();
+        }
+
+        for(Thread t : threads) {
+            try {
+                t.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        long end = System.currentTimeMillis();
+        System.out.println(end - start);
+
+        System.out.println(m.size());
+
+        //-----------------------------------
+
+        start = System.currentTimeMillis();
+        for (int i = 0; i < threads.length; i++) {
+            threads[i] = new Thread(()->{
+                for (int j = 0; j < 10000000; j++) {
+                    m.get(keys[10]);
+                }
+            });
+        }
+
+        for(Thread t : threads) {
+            t.start();
+        }
+
+        for(Thread t : threads) {
+            try {
+                t.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        end = System.currentTimeMillis();
+        System.out.println(end - start);
+    }
+}
+```
+
+#### Vectoræµ‹è¯•
+
+vectoræ‰€è°“çš„çº¿ç¨‹å®‰å…¨æŒ‡çš„æ˜¯è°ƒç”¨å®¹å™¨æ–¹æ³•ï¼Œå¦‚removeæ—¶ï¼Œè®¿é—®æ—¶å®‰å…¨çš„ã€‚ä½†æ˜¯å½“å–åˆ°æœ€åä¸€å¼ ç¥¨æ—¶ï¼Œå„ä¸ªçº¿ç¨‹åˆ¤æ–­sizeæ˜¯å¦ä¸ºç©ºæ—¶æ²¡æœ‰äº‰ç”¨ï¼Œåˆ†åˆ«è¿›å…¥ç¡çœ ï¼Œå†å»å–ç¥¨ï¼Œäº§ç”Ÿå†²çªã€‚
+
+```java
+/**
+ * æœ‰Nå¼ ç«è½¦ç¥¨ï¼Œæ¯å¼ ç¥¨éƒ½æœ‰ä¸€ä¸ªç¼–å·
+ * åŒæ—¶æœ‰10ä¸ªçª—å£å¯¹å¤–å”®ç¥¨
+ * è¯·å†™ä¸€ä¸ªæ¨¡æ‹Ÿç¨‹åº
+ * 
+ * åˆ†æä¸‹é¢çš„ç¨‹åºå¯èƒ½ä¼šäº§ç”Ÿå“ªäº›é—®é¢˜ï¼Ÿ
+ *  
+ * ä½¿ç”¨Vectoræˆ–è€…Collections.synchronizedXXX
+ * åˆ†æä¸€ä¸‹ï¼Œè¿™æ ·èƒ½è§£å†³é—®é¢˜å—ï¼Ÿ
+ * 
+ * @author é©¬å£«å…µ
+ */
+package com.mashibing.juc.c_024_FromVectorToQueue;
+
+import java.util.Vector;
+import java.util.concurrent.TimeUnit;
+
+public class TicketSeller2 {
+   static Vector<String> tickets = new Vector<>();
+   
+   
+   static {
+      for(int i=0; i<1000; i++) tickets.add("ç¥¨ ç¼–å·ï¼š" + i);
+   }
+   
+   public static void main(String[] args) {
+      
+      for(int i=0; i<10; i++) {
+         new Thread(()->{
+            while(tickets.size() > 0) {
+               
+               try {
+                  TimeUnit.MILLISECONDS.sleep(10);
+               } catch (InterruptedException e) {
+                  e.printStackTrace();
+               }
+               
+               
+               System.out.println("é”€å”®äº†--" + tickets.remove(0));
+            }
+         }).start();
+      }
+   }
+}
+```
+
+#### Queueå–ç¥¨æµ‹è¯•
+
+pullæ˜¯ä¸€ä¸ªåŸå­æ“ä½œï¼Œå†…éƒ¨æ˜¯caså®ç°çš„
+
+```java
+package com.mashibing.juc.c_0test;
+
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
+public class t2 {
+    static Queue<String> tickets = new ConcurrentLinkedQueue<>();
+    static{
+        for (int i = 0; i < 100; i++) {
+            tickets.add("ç¼–å·" + i);
+        }
+    }
+
+    public static void main(String[] args) {
+        for (int i = 0; i < 10; i++) {
+            new Thread(()->{
+                while (true){
+                    String poll = tickets.poll();
+                    if (poll == null) break;
+                    System.out.println("é”€å”®äº†" + poll);
+                }
+            }).start();
+        }
+    }
+
+
+}
+```
+
+
+
+
+
+### é˜»å¡é˜Ÿåˆ—-BlockingQueue
+
+#### æ–¹æ³•
+
+##### queueçš„æ–¹æ³•
+
+offer()		//addï¼Œè¿”å›Boolean
+
+peek()	//å–ï¼Œä¸remove
+
+poll()		//å–ï¼Œå¹¶remove
+
+##### blockåœ¨æ­¤åŸºç¡€ä¸ŠåŠ çš„æ–¹æ³•
+
+put		//è£…ä¸è¿›å»å°±å…ˆé˜»å¡
+
+take		//å–é˜»å¡
+
+
+
+* queueå’Œlistçš„åŒºåˆ«å°±ä½“ç°åœ¨è¿™é‡Œ
+  queueæä¾›äº†è¿™äº›å¯¹å¤šçº¿ç¨‹å‹å¥½çš„æ“ä½œ
+
+
+
+#### ç§ç±»
+
+##### LinkedBlockingQueue
+
+LinkedBlockingQueeå®ç°å–ç¥¨
+
+```java
+public class T08_LinkedBlockingQueue {
+    static BlockingQueue<String> tickets = new LinkedBlockingQueue<>();
+    static Random r = new Random();
+
+    public static void main(String[] args) {
+        new Thread(()->{
+            for (int i = 0; i < 1000; i++) {
+                try {
+                    tickets.put("code"+ i);
+                    TimeUnit.MILLISECONDS.sleep(r.nextInt(1000));
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+
+        for (int i = 0; i < 10; i++) {
+            new Thread(()->{
+                try {
+                    while (true){
+                        System.out.println(Thread.currentThread().getName()+ "take off the ===="+tickets.take());
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+        }
+
+    }
+
+
+
+}
+```
+
+#### ==DelayQueue
+
+```java
+package com.mashibing.juc.c_025;
+
+import java.util.Calendar;
+import java.util.Random;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.DelayQueue;
+import java.util.concurrent.Delayed;
+import java.util.concurrent.TimeUnit;
+
+public class T07_DelayQueue {
+
+   static BlockingQueue<MyTask> tasks = new DelayQueue<>();
+
+   static Random r = new Random();
+   
+   static class MyTask implements Delayed {
+      String name;
+      long runningTime;
+      
+      MyTask(String name, long rt) {
+         this.name = name;
+         this.runningTime = rt;
+      }
+
+      @Override
+      public int compareTo(Delayed o) {
+         if(this.getDelay(TimeUnit.MILLISECONDS) < o.getDelay(TimeUnit.MILLISECONDS))
+            return -1;
+         else if(this.getDelay(TimeUnit.MILLISECONDS) > o.getDelay(TimeUnit.MILLISECONDS)) 
+            return 1;
+         else 
+            return 0;
+      }
+
+      @Override
+      public long getDelay(TimeUnit unit) {
+         
+         return unit.convert(runningTime - System.currentTimeMillis(), TimeUnit.MILLISECONDS);
+      }
+      
+      
+      @Override
+      public String toString() {
+         return name + " " + runningTime;
+      }
+   }
+
+   public static void main(String[] args) throws InterruptedException {
+      long now = System.currentTimeMillis();
+      MyTask t1 = new MyTask("t1", now + 1000);
+      MyTask t2 = new MyTask("t2", now + 2000);
+      MyTask t3 = new MyTask("t3", now + 1500);
+      MyTask t4 = new MyTask("t4", now + 2500);
+      MyTask t5 = new MyTask("t5", now + 500);
+      
+      tasks.put(t1);
+      tasks.put(t2);
+      tasks.put(t3);
+      tasks.put(t4);
+      tasks.put(t5);
+      
+      System.out.println(tasks);
+      
+      for(int i=0; i<5; i++) {
+         System.out.println(tasks.take());
+      }
+   }
+}
+```
+
+#### SynchronizeQueue
+
+è¿™ä¸ªé˜Ÿåˆ—æ˜¯ç©ºçš„ï¼Œä¸èƒ½åœ¨é‡Œé¢æ”¾ä¸œè¥¿ï¼Œåªèƒ½1å…ˆtake()åœ¨é‚£é˜»å¡ï¼Œç­‰ç€2å»take()ã€‚ç›¸å½“äºä¸¤ä¸ªçº¿ç¨‹æ‰‹æŠŠæ‰‹äº¤æ¢ã€‚
+
+```java
+package com.mashibing.juc.c_025;
+
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.SynchronousQueue;
+
+public class T08_SynchronizeQueue { //å®¹é‡ä¸º0
+   public static void main(String[] args) throws InterruptedException {
+      BlockingQueue<String> strs = new SynchronousQueue<>();
+      
+      new Thread(()->{
+         try {
+            System.out.println(strs.take());
+         } catch (InterruptedException e) {
+            e.printStackTrace();
+         }
+      }).start();
+
+      strs.put("aaa"); //é˜»å¡ç­‰å¾…æ¶ˆè´¹è€…æ¶ˆè´¹
+      //strs.put("bbb");
+      //strs.add("aaa");
+      System.out.println(strs.size());
+   }
+}
+```
+
+#### TransferQueue
+
+strs.transfer("aaa"),å¿…é¡»æœ‰ç»“æœæ‰ä¼šç¦»å¼€
+
+MQåº•å±‚å°±æ˜¯ç”¨è¿™ç§é€»è¾‘ï¼Œæ¯”å¦‚ï¼Œç¡®è®¤ç”¨æˆ·çš„è®¢å•å¾—åˆ°äº†å¤„ç†
+
+```java
+package com.mashibing.juc.c_025;
+
+import java.util.concurrent.LinkedTransferQueue;
+
+public class T09_TransferQueue {
+   public static void main(String[] args) throws InterruptedException {
+      LinkedTransferQueue<String> strs = new LinkedTransferQueue<>();
+      
+      new Thread(() -> {
+         try {
+            System.out.println(strs.take());
+         } catch (InterruptedException e) {
+            e.printStackTrace();
+         }
+      }).start();
+      
+      strs.transfer("aaa");
+      
+      //strs.put("aaa");
+
+
+      /*new Thread(() -> {
+         try {
+            System.out.println(strs.take());
+         } catch (InterruptedException e) {
+            e.printStackTrace();
+         }
+      }).start();*/
+
+
+   }
+}
+```
+
+#### åº”ç”¨æ¡ˆä¾‹ï¼ˆäº¤æ›¿æ‰“å°ï¼‰
+
+##### synchronizedæ–¹æ³•
+
+```
+package com.mashibing.juc.c_026_00_interview.A1B2C3;
+
+
+public class T06_00_sync_wait_notify {
+    public static void main(String[] args) {
+        final Object o = new Object();
+
+        char[] aI = "1234567".toCharArray();
+        char[] aC = "ABCDEFG".toCharArray();
+
+        new Thread(()->{
+            synchronized (o) {
+                for(char c : aI) {
+                    System.out.print(c);
+                    try {
+                        o.notify();
+                        o.wait(); //è®©å‡ºé”
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                o.notify(); //å¿…é¡»ï¼Œå¦åˆ™æ— æ³•åœæ­¢ç¨‹åº
+            }
+
+        }, "t1").start();
+
+        new Thread(()->{
+            synchronized (o) {
+                for(char c : aC) {
+                    System.out.print(c);
+                    try {
+                        o.notify();
+                        o.wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                o.notify();
+            }
+        }, "t2").start();
+    }
+}
+
+//å¦‚æœæˆ‘æƒ³ä¿è¯t2åœ¨t1ä¹‹å‰æ‰“å°ï¼Œä¹Ÿå°±æ˜¯è¯´ä¿è¯é¦–å…ˆè¾“å‡ºçš„æ˜¯Aè€Œä¸æ˜¯1ï¼Œè¿™ä¸ªæ—¶å€™è¯¥å¦‚ä½•åšï¼Ÿ
+```
+
+##### Locksupport
+
+```java
+package com.mashibing.juc.c_026_00_interview.A1B2C3;
+
+
+import java.util.concurrent.locks.LockSupport;
+
+//Locksupport park å½“å‰çº¿ç¨‹é˜»å¡ï¼ˆåœæ­¢ï¼‰
+//unpark(Thread t)
+
+public class T02_00_LockSupport {
+
+
+    static Thread t1 = null, t2 = null;
+
+    public static void main(String[] args) throws Exception {
+        char[] aI = "0123456789".toCharArray();
+        char[] aC = "ABCDEFGHIJ".toCharArray();
+
+        t1 = new Thread(() -> {
+
+                for(char c : aI) {
+                    System.out.print(c);
+                    LockSupport.unpark(t2); //å«é†’T2
+                    LockSupport.park(); //T1é˜»å¡
+                }
+
+        }, "t1");
+
+        t2 = new Thread(() -> {
+
+            for(char c : aC) {
+                LockSupport.park(); //t2é˜»å¡
+                System.out.print(c);
+                LockSupport.unpark(t1); //å«é†’t1
+            }
+
+        }, "t2");
+
+        t1.start();
+        t2.start();
+    }
+}
+```
+
+caså†™æ³•
+
+```java
+package com.mashibing.juc.c_026_00_interview.A1B2C3;
+
+
+public class T03_00_cas {
+
+    enum ReadyToRun {T1, T2}
+
+    static volatile ReadyToRun r = ReadyToRun.T1; //æ€è€ƒä¸ºä»€ä¹ˆå¿…é¡»volatile
+
+    public static void main(String[] args) {
+
+        char[] aI = "1234567".toCharArray();
+        char[] aC = "ABCDEFG".toCharArray();
+
+        new Thread(() -> {
+
+            for (char c : aI) {
+                while (r != ReadyToRun.T1) {}
+                System.out.print(c);
+                r = ReadyToRun.T2;
+            }
+
+        }, "t1").start();
+
+        new Thread(() -> {
+
+            for (char c : aC) {
+                while (r != ReadyToRun.T2) {}
+                System.out.print(c);
+                r = ReadyToRun.T1;
+            }
+        }, "t2").start();
+    }
+}
+```
+
+##### transferQueue
+
+```java
+package com.mashibing.juc.c_026_00_interview.A1B2C3;
+
+import java.util.concurrent.LinkedTransferQueue;
+import java.util.concurrent.TransferQueue;
+
+public class T13_TransferQueue {
+    public static void main(String[] args) {
+        char[] aI = "1234567".toCharArray();
+        char[] aC = "ABCDEFG".toCharArray();
+
+        TransferQueue<Character> queue = new LinkedTransferQueue<Character>();
+        new Thread(()->{
+            try {
+                for (char c : aI) {
+                    System.out.print(queue.take());
+                    queue.transfer(c);
+                }
+
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }, "t1").start();
+
+        new Thread(()->{
+            try {
+                for (char c : aC) {
+                    queue.transfer(c);
+                    System.out.print(queue.take());
+                }
+
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }, "t2").start();
+    }
+}
+```
+
+
+
+
+
+
+
+ä¹è§‚é”
+

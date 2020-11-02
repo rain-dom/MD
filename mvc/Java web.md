@@ -290,17 +290,256 @@ request.getRequestDispatcher("hello").forward(request,response);
 response.sendRedirect("hello");
 ```
 
-#### web.xml
+#### Cookie
 
-匹配后通过反射生成servlet对象执行service
+```java
+public class CookieServlet extends HttpServlet {
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        this.doGet(req, resp);
+    }
 
-```xml
-<servlet>
-    <servlet-name>myServlet</servlet-name>
-    <servlet-class>com.dzp.MyServlet</servlet-class>
-</servlet>
-<servlet-mapping>
-    <servlet-name>myServlet</servlet-name>
-    <url-pattern>/first</url-pattern>
-</servlet-mapping>
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        //防止乱码
+        req.setCharacterEncoding("UTF-8");
+        resp.setCharacterEncoding("gbk");
+        resp.getWriter().write("传达到了");
+        Cookie cookie = new Cookie("01","this is 第一");
+        //添加有效时间
+        cookie.setMaxAge(7*24*3600);
+        resp.addCookie(cookie);
+    }
+}
 ```
+
+获取cookie
+
+```java
+     Cookie[] cookies = req.getCookies();
+    for (Cookie cookie : cookies) {
+        String key = cookie.getName();
+        String value = cookie.getValue();
+        System.out.println(key +"="+value);
+    }
+}
+```
+
+
+
+#### Seesion
+
+![session](E:\deng\deng\MD\mvc\image\session.png)
+
+用户使用浏览器第一次向服务器发送请求，服务器在接受到请求后，调用对应的Servlet 进行处理。在处理过程中会给用户创建一个session对象，用来存储用户请求处理相关的公共数据，并将此session 对象的JSESSIONID以sessoin的形式存储在浏览器中（临时存储，浏览器关闭即失效）。用户在发起第二次请求及后续请求时，请求信息中会附带JSESSIONID，服务器在接收到请求后，调用对应的Servlet 进行请求处理，同时根据JSESSIONID 返回其对应的 session对象
+
+**作用：**
+
+*      解决相同用户发送不同请求时的数据共享问题
+
+**特点：**
+
+*      1、服务器端存储共享数据的技术
+*      2、session需要依赖cookie技术
+*      3、每个用户对应一个独立的session对象
+*      4、每个session对象的有效时长是30分钟
+*      5、每次关闭浏览器的时候，重新请求都会开启一个新的session对象，因为返回的JSESSIONID保存在浏览器的内存中，是临时cookie，所以关闭之后自然消失
+
+**使用：**
+
+*      获取session对象
+*      HttpSession session = request.getSession();
+*      session.setAttribute("name",u.getname())
+*      修改session会话的保持时间
+*      session.setMaxInactiveInterval(int second);
+*      设置强制失效
+*      session.invalidate();
+
+#### ServletContext
+
+* 运行在JVM上的每一个web应用程序都有一个与之对应的Servlet上下文（Servlet运行环境）
+
+* Servlet API提供ServletContext接口用来表示Servlet上下文，ServletContext对象可以被web应用程序中的所有servlet访问
+* ServletContext对象是web服务器中的一个已知路径的根
+
+**使用**
+
+ServletContext context = this.getServletContext();
+
+context .setAttribute("name",u.getname())
+
+![contextAPI](E:\deng\deng\MD\mvc\image\contextAPI.png)
+
+#### ServletConfig
+
+**作用：**
+ServletConfig对象是Servlet的专属配置对象，每个Servlet都单独拥有一个ServletConfig对象，用来获取web.xml中的配置信息
+**使用：**
+-获取ServletConfig对象
+-获取web.xml中的servlet配置信息
+
+
+
+
+
+#### 过滤器
+
+继承Filter类,重写方法实现逻辑
+
+在web.xml中配置过滤规则
+
+
+
+存在U型执行链
+
+#### 监听器
+
+![监听器](E:\deng\deng\MD\mvc\image\监听器.png)
+
+
+
+### jsp
+
+java server page
+
+因为HTML页面是固定的，而直接接在servlet中写html会导致耦合度过高，因此催生了jsp
+
+**属性**：jsp是一种动态网页技术
+
+**本质**： 是servlet也是jsp，通过jsp引擎转译成servlet
+
+#### **工作原理**
+
+![jsp](E:\deng\deng\MD\mvc\image\jsp.png)
+
+执行过程
+
+客户端显示的访问路径不会变 
+
+<%--
+    html注释
+        也会被转译成java文件，会发送给浏览器，但是浏览器不会执行
+    java注释
+        也会被转译，但是不会发送给浏览器
+    jsp注释
+        不会被转译
+--%>
+<%--
+    page:
+        用来设置转译成servlet文件时的参数
+            contentType:表示浏览器解析响应信息的时候使用的编码和解析格式
+            language：表示jsp要转译成的文件类型
+            import:导入需要的jar包，多个包使用逗号分隔
+            pageEncoding:设置页面的编码格式
+            session:用来控制sevlet中是否有session对象
+            errorPage:当页面发生逻辑错误的时候，跳转的页面
+            extends:需要要转译的servlet类要继承的父类（包名+类名）
+    局部代码块：
+        可以将java代码跟页面展示的标签写到一个jsp页面中，java代码转译成的servlet文件中，java代码跟输出是保存在service方法中的
+        缺点：
+            代码可读性比较差，开发比较麻烦
+            一般不使用
+    全局代码块：
+        定义公共的方法的时候需要使用全局代码块使用<%!%>、，生成的代码在servlet类中
+        调用的时候需要使用局部代码块
+    脚本调用方式
+        使用<%=直接调用变量和方法（必须有返回值）%>
+        注意：不能再变量或方法的后面添加；
+    页面导入的方式
+        静态导入：
+            <%@ include file="staticImport.jsp"%>  file中填写的是jsp文件的相对路径
+            不会将静态导入的页面生成一个新的servlet文件，而是将两个文件合并，
+            优点：运行效率高
+            缺点：两个页面会耦合到一起，不利于维护，两个页面中不能存在相同名称的变量名
+        动态导入：
+            <jsp:include page="dynamicImport.jsp"></jsp:include>
+            两个页面不会进行合并，分别生成自己的servlet文件，但是页面在最终展示的时候是合并到一起的
+            优点：没有耦合，可以存在同名的变量
+
+#### 请求转发：
+
+​            在jsp中也可以实现servlet的请求转发功能
+​            <jsp:forward page="forward.jsp"></jsp:forward>  page填写的是jsp页面的相对路径
+​            注意：在标签中间不可以添加任何字符.除了<jsp:param name="" value="">
+​            在转发的页面中想要获取到属性值通过request.getParameter(String key)
+
+#### jsp九大内置对象：
+
+​            jsp页面在转移成其对应的servlet文件的时候，会自动声明一些对象，在jsp页面中可以直接使用
+​            注意：内置对象是在jsp页面中使用的，可以在局部代码块中使用，也可以在脚本段语句中使用，但是不能再全局代码块中使用
+
+​            九大对象：
+​                **pageContext**：表示页面的上下文的对象封存了其他的内置对象，封存了当前页面的运行信息
+​                            注意：每一个页面都有一个对应的pagecontext对象，
+​                            伴随着当前页面的结束而结束
+​                **request**：封装当前请求的数据，由tomcat创建，一次请求对应一个request对象
+​                **session**：用来封装同一个用户的不同请求的共享数据，一次会话对应一个session对象
+​                **application**：相当于ServletContext对象，一个web项目只有一个对象，存储着所有用户的共享数据，从服务器启动到服务器结束
+​                **response**：响应对象，用来响应请求数据，将处理结果返回给浏览器，可以进行重定向
+​                **page**:代表当前jsp对象，跟java中的this指针类似
+​                **exception**：异常对象，存储当前运行的异常信息，必须在page指令=中添加属性isErrorPage=true
+​                **config**:相当于Serlverconfig对象，用来获取web.xml中配置的数据，完成servlet的初始化操作
+​                **out**：响应对象，jsp内部使用，带有缓存区的响应对象，效率要高于repsonse
+
+#### 四大作用域：
+
+​			小 ---------------------------> 大
+
+​                **pageContext**：表示当前页面，解决当前页面内的数据共享问题，获取其他内置对象
+​                **request**：一次请求，一次请求的servlet的数据共享，通过请求转发的方式，将数据流转到下一个servlet
+​                **session**：一次会话，一个用户发送的不同请求之间的数据共享，可以将数据从一个请求流转到其他请求
+​                **application**：项目内，不同用的数据共享问题，将数据从一个用户流转到其他用户
+​        路径问题：
+​                想要获取项目中的资源，可以使用相对路径，也可以使用绝对路径
+​                **相对路径**：相对于当前页面的路径
+​                    问题：1、资源的位置不可以随便更改
+​                          2、需要使用../的方式进行文件夹的跳出，如果目录结果比较深，可以操作起来比较麻烦
+​                **绝对路径**：
+​                    在请求路径的前面加/,表示当前服务器的根路径，使用的时候要添加/虚拟项目名称/资源目录
+​                使用jsp中自带的全局路径声明：
+
+​                    String path = request.getContextPath();
+​                        System.out.println(path);
+​                    String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+​                        System.out.println(basePath);
+
+
+                    <base href="<%=basePath%>">
+
+​                    添加资源路径的时候，从当前项目的web目录下添加即可
+
+
+
+
+
+#### EL
+
+EL表达式可以进行算术运算和关系运算
+
+*          直接在表达式中写入算法操作即可，如果是关系运算，返回true或者false
+*          注意：在el表达式中的+表示加法操作而不是字符串连接符
+*      EL表达式可以进行逻辑运算
+*          ${true&&false}<br>
+*          ${true&&true}<br>
+*          ${true||false}<br>
+*          ${true||true}<br
+
+EL表达式获取header信息
+
+*          ${header}:获取所有请求头信息
+*          ${header[key]}:获取指定key的数据
+*          ${headerValues[key]}:获取key对应的一组数据，返回类型是数组
+*          ${headervalues[key][0]}:获取key对应数组的某一个值
+
+EL表达式获取cookie数据：
+
+*          ${cookie}:获取cookie中的所有数据
+*          ${cookie.key}：获取cookie中指定key的数据
+*          ${cookie.key.name}：获取cookie指定key数据的name
+*          ${cookie.key.value}：获取cookie指定key数据的value
+
+#### 登录小程序
+
+
+
+Seesion
