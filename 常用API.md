@@ -9,10 +9,12 @@
 
 ### String
 
-| 方法                             | 用处            |
-| -------------------------------- | --------------- |
-| String[] str = string.split("#") | 将字符串以#分割 |
-|                                  |                 |
+| 方法                                | 用处                   |
+| ----------------------------------- | ---------------------- |
+| String[] str = string.split("#")    | 将字符串以#分割        |
+| ToStringBuider.reflectionToString() | 变为字符串             |
+| trim()                              | 删除字符串的头尾空白符 |
+| StringUtils.isNotBlank              | 判断非空               |
 
 
 
