@@ -325,6 +325,36 @@ file-->new Model-->physical data modal
 
 
 
+## 事务处理
+
+savepoint test1
+
+rollback to test1
+
+### 事物的ACID属性
+
+* 最终为了保持一致性
+
+![事务的ACID属性](E:\deng\image\事务的ACID属性.png)
+
+### 锁的机制
+
+为了解决并发访问时数据不一致问题，给数据加锁时需考虑"粒度"的问题：
+
+一般情况下，锁的粒度越小，效率越高。粒度越大，效率越低。大部分情况用行级锁
+
+
+
+## 数据库设计三范式
+
+![第一范式](E:\deng\image\第一范式.png)
+
+![第二范式](E:\deng\image\第二范式.png)
+
+![第三范式](E:\deng\image\第三范式.png)
+
+
+
 ## mysql的锁机制
 
 ### 1、MySQL锁的基本介绍
@@ -687,7 +717,38 @@ B:insert into psn values(4,'sisi');--报错，无法插入数据
 
 
 
+## 日志
 
+**Redo LOG**——innodb存储引擎的日志文件
+
+保证持久性
+
+![小黑板](E:\deng\image\小黑板.png)
+
+![日志](E:\deng\image\日志.png)
+
+**Undo log**——回滚日志
+
+实现事务原子性
+
+在操作任何数据之前，首先将数据备份到一个地方（这个存储数据备份的地方称为UndoLog）。然后进行数据的修改。
+
+如果出现了错误或者用户执行了ROLLBACK语句，系统可以利用Undo Log中的备份将数据恢复到事务开始之前的状态
+注意：undo log是逻辑日志，可以理解为：
+
+​	你执行delete，undolog就会执行一条insert
+
+**binlog**
+
+归属于服务端而不是存储引擎
+
+追加写的，不会覆盖之前的日志信息
+
+#### 更新流程
+
+![更新流程](E:\deng\image\更新流程.png)
+
+**为了保持数据一致性**，将redolog分成两阶段提交。
 
 
 
@@ -895,35 +956,3 @@ select * from table where name="zhangsan" and age=10
 
 
 
-## 日志
-
-**Redo LOG**——innodb存储引擎的日志文件
-
-保证持久性
-
-![小黑板](E:\deng\image\小黑板.png)
-
-![日志](E:\deng\image\日志.png)
-
-**Undo log**——回滚日志
-
-实现事务原子性
-
-在操作任何数据之前，首先将数据备份到一个地方（这个存储数据备份的地方称为UndoLog）。然后进行数据的修改。
-
-如果出现了错误或者用户执行了ROLLBACK语句，系统可以利用Undo Log中的备份将数据恢复到事务开始之前的状态
-注意：undo log是逻辑日志，可以理解为：
-
-​	你执行delete，undolog就会执行一条insert
-
-**binlog**
-
-归属于服务端而不是存储引擎
-
-追加写的，不会覆盖之前的日志信息
-
-#### 更新流程
-
-![更新流程](E:\deng\image\更新流程.png)
-
-**为了保持数据一致性**，将redolog分成两阶段提交。
