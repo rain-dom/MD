@@ -2,6 +2,8 @@
 
 ### 编译到执行
 
+通过javac编译成class文件，jvm才可读
+
 ![编译到执行](E:\deng\deng\MD\jvm\img\编译到执行.png)
 
 
