@@ -83,6 +83,8 @@ Linux IO
 
 ![零拷贝](E:\deng\deng\MD\image\redis\零拷贝.png)
 
+jvm用户空间可以直接访问kernel的一块内存，不用再拷贝到jvm中再使用
+
 以前是read到用户态，再write回内核，再发给网卡
 
 调用sendfile后省去了拷贝的过程，kernel直接发给网卡

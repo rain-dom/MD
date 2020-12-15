@@ -1,19 +1,20 @@
-### GC的基础知识
+## GC的基础知识
 
 #### 1.什么是垃圾
 
-> C语言申请内存：malloc free
+> C++
 >
-> C++： new delete
+> 	- 手工处理垃圾
+>  - 忘记回收
+>    	- 内存泄露
+>  - 回收多次
+>    	- 非法访问
+> 	- 开发效率低，执行效率高
 >
-> c/C++ 手动回收内存
+> Java
 >
-> Java: new ？
->
-> 自动内存回收，编程上简单，系统不容易出错，手动释放内存，容易出两种类型的问题：
->
-> 1. 忘记回收
-> 2. 多次回收
+> 	* GC处理垃圾
+> 	* 开发效率高，执行效率低
 
 ==没有任何引用==指向的一个对象或者多个对象（==循环引用==）
 
@@ -28,8 +29,9 @@
 
 #### 3.常见的垃圾回收算法
 
-1. 标记清除(mark sweep) - 位置不连续 产生碎片 效率偏低（两遍扫描）
-   * 找到垃圾，标记。
+1. 标记清除(mark sweep) - 找到垃圾，标记。
+   * 位置不连续 产生碎片 效率偏低（两遍扫描）
+   * 存活对象多的情况下效率比较高
 2. 拷贝算法 (copying) - 没有碎片，浪费空间
    * 只用一半内存，回收时把在用的内存拷贝到备用空间。
 3. 标记压缩(mark compact) - 没有碎片，效率偏低（两遍扫描，指针需要调整）
@@ -75,7 +77,7 @@
    1. 顽固分子
    2. 老年代满了FGC（Full GC）
 
-5. GC Tuning (Generation)
+5. GC Tuning (Generation) ==调优目标==
    1. 尽量减少FGC
 
       > 非常耗时，会出现STW（stop world），系统停顿现象
@@ -83,6 +85,9 @@
    3. MajorGC = FGC
 
 6. 对象分配过程图
+   
+> 
+
    ![](对象分配过程详解.png)
 
 7. 动态年龄：（不重要）
@@ -96,12 +101,19 @@
 
 ![常用垃圾回收器](E:\deng\deng\MD\jvm\img\常用垃圾回收器.png)
 
-1. JDK诞生 Serial追随 提高效率，诞生了PS，为了配合CMS，诞生了PN，CMS是1.4版本后期引入，CMS是里程碑式的GC，它开启了并发回收的过程，但是CMS毛病较多，因此目前任何一个JDK版本默认是CMS
+> 左边物理和概念上都分代，右边只是逻辑上分代
+>
+> 一般线上默认PS+PO
+>
+> 还有				PN+CMS
+
+1. JDK诞生后就伴随Serial，提高效率，诞生了PS，为了配合CMS，诞生了PN，CMS是1.4版本后期引入，CMS是里程碑式的GC，它开启了并发回收的过程，但是CMS毛病较多，因此目前没有  任何一个JDK版本默认是CMS
    并发垃圾回收是因为无法忍受STW
    
 2. Serial 年轻代 串行回收
 
-   > 单线程，回收时其他线程停止
+   > 单线程，STW，回收时其他线程停止，现在用的极少
+
 3. PS 年轻代 并行回收
 
    > 多线程，回收时其他线程停止
@@ -145,6 +157,12 @@
 
 1.8默认的垃圾回收：==PS== + ==ParallelOld==
 
+
+
+![CMS](E:\deng\deng\MD\jvm\img\CMS.png)
+
+## 调优实战
+
 ### 常见垃圾回收器组合参数设定：(1.8)
 
 * -XX:+UseSerialGC = Serial New (DefNew) + Serial Old
@@ -153,8 +171,7 @@
   * 这个组合已经很少用（在某些版本中已经废弃）
   * https://stackoverflow.com/questions/34962257/why-remove-support-for-parnewserialold-anddefnewcms-in-the-future
 * -XX:+UseConc<font color=red>(urrent)</font>MarkSweepGC = ParNew + CMS + Serial Old
-* -XX:+UseParallelGC = Parallel Scavenge + Parallel Old (1.8默认) 【PS + SerialOld】
-* -XX:+UseParallelOldGC = Parallel Scavenge + Parallel Old
+* -XX:+UseParallelGC = Parallel Scavenge + Parallel Old (1.8==默认==) 【PS + SerialOld】
 * -XX:+UseG1GC = G1
 * Linux中没找到默认GC的查看方法，而windows中会打印UseParallelGC 
   * java +XX:+PrintCommandLineFlags -version
@@ -204,13 +221,25 @@
   
 
   1. 区分概念：内存泄漏memory leak，内存溢出out of memory
+  
   2. java -XX:+PrintCommandLineFlags HelloGC
+  
+     > -XX:+UseCompressedClassPointers
+     > -XX:+UseCompressedOops
+     > 默认开启的指令，压缩指针
   3. java -Xmn10M -Xms40M -Xmx60M -XX:+PrintCommandLineFlags -XX:+PrintGC  HelloGC
      PrintGCDetails PrintGCTimeStamps PrintGCCauses
+  
+     > 设置堆最大最小空间，一般设置成一样的，防止它弹性压缩，浪费系统资源。
+  
   4. java -XX:+UseConcMarkSweepGC -XX:+PrintCommandLineFlags HelloGC
+  
   5. java -XX:+PrintFlagsInitial 默认参数值
+  
   6. java -XX:+PrintFlagsFinal 最终参数值
+  
   7. java -XX:+PrintFlagsFinal | grep xxx 找到对应的参数
+  
   8. java -XX:+PrintFlagsFinal -version |grep GC
 
 ### PS GC日志详解
@@ -234,8 +263,8 @@ total = eden + 1个survivor
 
 ### 调优前的基础概念：
 
-1. 吞吐量：用户代码时间 /（用户代码执行时间 + 垃圾回收时间）
-2. 响应时间：STW越短，响应时间越好
+1. ==吞吐量==：用户代码时间 /（用户代码执行时间 + 垃圾回收时间）
+2. ==响应时间==：STW越短，响应时间越好
 
 所谓调优，首先确定，追求啥？吞吐量优先，还是响应时间优先？还是在满足一定的响应时间的情况下，要求达到多大的吞吐量...
 
@@ -266,7 +295,13 @@ total = eden + 1个survivor
   4. 选定CPU（越高越好）
   5. 设定年代大小、升级年龄
   6. 设定日志参数
-     1. -Xloggc:/opt/xxx/logs/xxx-xxx-gc-%t.log -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=5 -XX:GCLogFileSize=20M -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCCause
+     1. -Xloggc:/opt/xxx/logs/xxx-xxx-gc-%t.log 
+        -XX:+UseGCLogFileRotation （循环使用)
+        -XX:NumberOfGCLogFiles=5 （5个循环使用，用满就回过头来干掉第一个)
+        -XX:GCLogFileSize=20M （每个20M)
+        -XX:+PrintGCDetails 
+        -XX:+PrintGCDateStamps 
+        -XX:+PrintGCCause
      2. 或者每天产生一个日志文件
   7. 观察日志情况
   
@@ -279,6 +314,8 @@ total = eden + 1个survivor
   > 经验值，
   >
   > 非要计算：一个订单产生需要多少内存？512K * 1000 500M内存
+  >
+  > 考虑到cpu的算力和大小
   >
   > 专业一点儿问法：要求响应时间100ms
   >
@@ -406,28 +443,27 @@ total = eden + 1个survivor
 
 3. 一般是运维团队首先受到报警信息（CPU Memory）
 
-4. top命令观察到问题：内存不断增长 CPU占用率居高不下
+4. `top`命令观察到问题：内存不断增长 CPU占用率居高不下
 
-5. top -Hp 观察进程中的线程，哪个线程CPU和内存占比高
+5. `top -Hp` 观察进程中的线程，哪个线程CPU和内存占比高
 
-6. jps定位具体java进程
-   jstack 定位线程状况，重点关注：WAITING BLOCKED
-   eg.
-   waiting on <0x0000000088ca3310> (a java.lang.Object)
-   假如有一个进程中100个线程，很多线程都在waiting on <xx> ，一定要找到是哪个线程持有这把锁
+6. `jps`定位具体java 进程
+   `jstack -l 16进制` 定位线程状况，重点关注：WAITING BLOCKEDeg.
+   waiting on <0x0000000088ca3310> (a java.lang.Object) ==表示正在等待锁释放==
+   假如有一个进程中100个线程，很多线程都在waiting on <xx> ，一定要找到是哪个线程持有这把锁，会有很多线程显示在等待某个锁
    怎么找？搜索jstack dump的信息，找<xx> ，看哪个线程持有这把锁RUNNABLE
    作业：1：写一个死锁程序，用jstack观察 2 ：写一个程序，一个线程持有锁不释放，其他线程等待
-
+   
 7. 为什么阿里规范里规定，线程的名称（尤其是线程池）都要写有意义的名称
    怎么样自定义线程池里的线程名称？（自定义ThreadFactory）
 
-8. jinfo pid 
+8. `jinfo pid `
 
 9. jstat -gc 动态观察gc情况 / 阅读GC日志发现频繁GC / arthas观察 / jconsole/jvisualVM/ Jprofiler（最好用）
-   jstat -gc 4655 500 : 每个500个毫秒打印GC的情况
+   `jstat -gc 4655 500 `: 每个500个毫秒打印GC的情况
    如果面试官问你是怎么定位OOM问题的？如果你回答用图形界面（错误）
    1：已经上线的系统不用图形界面用什么？（cmdline arthas）
-   2：图形界面到底用在什么地方？测试！测试的时候进行监控！（压测观察）
+   2：图形界面到底用在什么地方？==测试==！测试的时候进行监控！（压测观察）
 
 10. jmap - histo 4655 | head -20，查找有多少对象产生
 
@@ -479,6 +515,8 @@ jhat -J-mx512M xxx.dump
 
 #### jprofiler (收费)
 
+
+
 #### arthas在线排查工具
 
 * 为什么需要在线排查？
@@ -518,13 +556,15 @@ jhat -J-mx512M xxx.dump
    > Concurrent Mode Failure
    > 产生：if the concurrent collector is unable to finish reclaiming the unreachable objects before the tenured generation fills up, or if an allocation cannot be satisfiedwith the available free space blocks in the tenured generation, then theapplication is paused and the collection is completed with all the applicationthreads stopped
    >
-   > 解决方案：降低触发CMS的阈值
-   >
-   > PromotionFailed
-   >
-   > 解决方案类似，保持老年代有足够的空间
-   >
-   > –XX:CMSInitiatingOccupancyFraction 92% 可以降低这个值，让CMS保持老年代足够的空间
+   > 
+
+==解决方案==：降低触发CMS的阈值
+
+PromotionFailed
+
+–XX:CMSInitiatingOccupancyFraction 92% 可以降低这个值，让CMS保持老年代足够的空间（65、50）
+
+> 在并行标记垃圾的时候，让老年代有足够的空间接收浮动垃圾
 
 #### CMS日志分析
 
