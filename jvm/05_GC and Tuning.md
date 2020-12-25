@@ -1,6 +1,4 @@
-## GC的基础知识
-
-#### 1.什么是垃圾
+##  GC的基础
 
 > C++
 >
@@ -542,84 +540,34 @@ jhat -J-mx512M xxx.dump
   由于做YGC时，需要扫描整个OLD区，效率非常低，所以JVM设计了CardTable， 如果一个OLD区CardTable中有对象指向Y区，就将它设为Dirty，下次扫描时，只需要扫描Dirty Card
   在结构上，Card Table用BitMap来实现
 
-### CMS
-
-#### CMS的问题
-
-1. Memory Fragmentation
-
-   > -XX:+UseCMSCompactAtFullCollection
-   > -XX:CMSFullGCsBeforeCompaction 默认为0 指的是经过多少次FGC才进行压缩
-
-2. Floating Garbage
-
-   > Concurrent Mode Failure
-   > 产生：if the concurrent collector is unable to finish reclaiming the unreachable objects before the tenured generation fills up, or if an allocation cannot be satisfiedwith the available free space blocks in the tenured generation, then theapplication is paused and the collection is completed with all the applicationthreads stopped
-   >
-   > 
-
-==解决方案==：降低触发CMS的阈值
-
-PromotionFailed
-
-–XX:CMSInitiatingOccupancyFraction 92% 可以降低这个值，让CMS保持老年代足够的空间（65、50）
-
-> 在并行标记垃圾的时候，让老年代有足够的空间接收浮动垃圾
-
-#### CMS日志分析
-
-执行命令：java -Xms20M -Xmx20M -XX:+PrintGCDetails -XX:+UseConcMarkSweepGC com.mashibing.jvm.gc.T15_FullGC_Problem01
-
-[GC (Allocation Failure) [ParNew: 6144K->640K(6144K), 0.0265885 secs] 6585K->2770K(19840K), 0.0268035 secs] [Times: user=0.02 sys=0.00, real=0.02 secs] 
-
-> ParNew：年轻代收集器
->
-> 6144->640：收集前后的对比
->
-> （6144）：整个年轻代容量
->
-> 6585 -> 2770：整个堆的情况
->
-> （19840）：整个堆大小
-
-
-
-```java
-[GC (CMS Initial Mark) [1 CMS-initial-mark: 8511K(13696K)] 9866K(19840K), 0.0040321 secs] [Times: user=0.01 sys=0.00, real=0.00 secs] 
-	//8511 (13696) : 老年代使用（最大）
-	//9866 (19840) : 整个堆使用（最大）
-[CMS-concurrent-mark-start]
-[CMS-concurrent-mark: 0.018/0.018 secs] [Times: user=0.01 sys=0.00, real=0.02 secs] 
-	//这里的时间意义不大，因为是并发执行
-[CMS-concurrent-preclean-start]
-[CMS-concurrent-preclean: 0.000/0.000 secs] [Times: user=0.00 sys=0.00, real=0.00 secs] 
-	//标记Card为Dirty，也称为Card Marking
-[GC (CMS Final Remark) [YG occupancy: 1597 K (6144 K)][Rescan (parallel) , 0.0008396 secs][weak refs processing, 0.0000138 secs][class unloading, 0.0005404 secs][scrub symbol table, 0.0006169 secs][scrub string table, 0.0004903 secs][1 CMS-remark: 8511K(13696K)] 10108K(19840K), 0.0039567 secs] [Times: user=0.00 sys=0.00, real=0.00 secs] 
-	//STW阶段，YG occupancy:年轻代占用及容量
-	//[Rescan (parallel)：STW下的存活对象标记
-	//weak refs processing: 弱引用处理
-	//class unloading: 卸载用不到的class
-	//scrub symbol(string) table: 
-		//cleaning up symbol and string tables which hold class-level metadata and 
-		//internalized string respectively
-	//CMS-remark: 8511K(13696K): 阶段过后的老年代占用及容量
-	//10108K(19840K): 阶段过后的堆占用及容量
-
-[CMS-concurrent-sweep-start]
-[CMS-concurrent-sweep: 0.005/0.005 secs] [Times: user=0.00 sys=0.00, real=0.01 secs] 
-	//标记已经完成，进行并发清理
-[CMS-concurrent-reset-start]
-[CMS-concurrent-reset: 0.000/0.000 secs] [Times: user=0.00 sys=0.00, real=0.00 secs]
-	//重置内部结构，为下次GC做准备
-```
-
-
-
 ### G1
 
 1. ▪https://www.oracle.com/technical-resources/articles/java/g1gc.html
 
+![G1](E:\deng\deng\MD\jvm\G1.png)
+
+
+
+#### GC何时触发
+
+* YGC
+  * Eden空间不足
+  * 多线程并行执行
+* FGC
+  * Old空间不足
+  * System.gc()
+
+
+
+#### 漏标
+
+黑色对象指向白色，同时灰色断开了对白色的引用。
+此时白色有对象引用却被错了，如果不处理的话就会被清除。
+因此灰色断开引用时会标记到GC栈中，二次扫描
+
 #### G1日志详解
+
+Y区的容量根据YGC的时间动态改变
 
 ```java
 [GC pause (G1 Evacuation Pause) (young) (initial-mark), 0.0015790 secs]
@@ -664,6 +612,83 @@ PromotionFailed
 
 
 
+
+
+### CMS
+
+#### CMS的问题
+
+1. Memory Fragmentation
+
+   > -XX:+UseCMSCompactAtFullCollection
+   > -XX:CMSFullGCsBeforeCompaction 默认为0 指的是经过多少次FGC才进行压缩
+
+2. Floating Garbage
+
+   > Concurrent Mode Failure
+   > 产生：if the concurrent collector is unable to finish reclaiming the unreachable objects before the tenured generation fills up, or if an allocation cannot be satisfiedwith the available free space blocks in the tenured generation, then theapplication is paused and the collection is completed with all the applicationthreads stoppedx
+   >
+   > 
+
+==解决方案==：降低触发CMS的阈值
+
+PromotionFailed
+
+–XX:CMSInitiatingOccupancyFraction 92% 可以降低这个值，让CMS保持老年代足够的空间（65、50）
+
+> 在并行标记垃圾的时候，让老年代有足够的空间接收浮动垃圾
+
+#### CMS日志分析
+
+执行命令：java -Xms20M -Xmx20M -XX:+PrintGCDetails -XX:+UseConcMarkSweepGC com.mashibing.jvm.gc.T15_FullGC_Problem01
+
+[GC (Allocation Failure) [ParNew: 6144K->640K(6144K), 0.0265885 secs] 6585K->2770K(19840K), 0.0268035 secs] [Times: user=0.02 sys=0.00, real=0.02 secs] 
+
+> ParNew：年轻代收集器
+>
+> 6144->640：收集前后的对比
+>
+> （6144）：整个年轻代容量
+>
+> 6585 -> 2770：整个堆的情况
+>
+> （19840）：整个堆大小
+
+
+
+```java
+[GC (CMS Initial Mark) [1 CMS-initial-mark: 8511K(13696K)] 9866K(19840K), 0.0040321 secs] [Times: user=0.01 sys=0.00, real=0.00 secs] 
+	//8511 (13696) : 老年代使用（最大）占68%时
+	//9866 (19840) : 整个堆使用（最大）
+[CMS-concurrent-mark-start]
+[CMS-concurrent-mark: 0.018/0.018 secs] [Times: user=0.01 sys=0.00, real=0.02 secs] 
+	//这里的时间意义不大，因为是并发执行
+[CMS-concurrent-preclean-start]
+[CMS-concurrent-preclean: 0.000/0.000 secs] [Times: user=0.00 sys=0.00, real=0.00 secs] 
+	//标记Card为Dirty，也称为Card Marking
+[GC (CMS Final Remark) [YG occupancy: 1597 K (6144 K)][Rescan (parallel) , 0.0008396 secs][weak refs processing, 0.0000138 secs][class unloading, 0.0005404 secs][scrub symbol table, 0.0006169 secs][scrub string table, 0.0004903 secs][1 CMS-remark: 8511K(13696K)] 10108K(19840K), 0.0039567 secs] [Times: user=0.00 sys=0.00, real=0.00 secs] 
+	//STW阶段，YG occupancy:年轻代占用及容量
+	//[Rescan (parallel)：STW下的存活对象标记
+	//weak refs processing: 弱引用处理
+	//class unloading: 卸载用不到的class
+	//scrub symbol(string) table: 
+		//cleaning up symbol and string tables which hold class-level metadata and 
+		//internalized string respectively
+	//CMS-remark: 8511K(13696K): 阶段过后的老年代占用及容量
+	//10108K(19840K): 阶段过后的堆占用及容量
+
+[CMS-concurrent-sweep-start]
+[CMS-concurrent-sweep: 0.005/0.005 secs] [Times: user=0.00 sys=0.00, real=0.01 secs] 
+	//标记已经完成，进行并发清理
+[CMS-concurrent-reset-start]
+[CMS-concurrent-reset: 0.000/0.000 secs] [Times: user=0.00 sys=0.00, real=0.00 secs]
+	//重置内部结构，为下次GC做准备
+```
+
+
+
+
+
 ### 案例汇总
 
 OOM产生的原因多种多样，有些程序未必产生OOM，不断FGC(CPU飙高，但内存回收特别少) （上面案例）
@@ -673,7 +698,7 @@ OOM产生的原因多种多样，有些程序未必产生OOM，不断FGC(CPU飙�
 2. 线程池不当运用产生OOM问题（见上）
    不断的往List里加对象（实在太LOW）
 
-3. smile jira问题
+3. smile jira问题 
    实际系统不断重启
    解决问题 加内存 + 更换垃圾回收器 G1
    真正问题在哪儿？不知道
@@ -755,6 +780,10 @@ OOM产生的原因多种多样，有些程序未必产生OOM，不断FGC(CPU飙�
 为什么C++程序员会重写finalize？（new delete）
    finalize耗时比较长（200ms）
    
+   > c++需要手动回收内存，delete操作析构函数去手动回收内存
+   >
+   > 他觉得java也需要回收，重写了finalize方法
+   
 10. 如果有一个系统，内存一直消耗不超过10%，但是观察GC日志，发现FGC总是频繁产生，会是什么引起的？
     System.gc() (这个比较Low)
 
@@ -795,8 +824,9 @@ OOM产生的原因多种多样，有些程序未必产生OOM，不断FGC(CPU飙�
 * -XX:+PrintFlagsFinal  -XX:+PrintFlagsInitial
   必须会用
 * -Xloggc:opt/log/gc.log
+  GC日志
 * -XX:MaxTenuringThreshold
-  升代年龄，最大值15
+  升代年龄，最大值15，默认6
 * 锁自旋次数 -XX:PreBlockSpin 热点代码检测参数-XX:CompileThreshold 逃逸分析 标量替换 ... 
   这些不建议设置
 
@@ -806,6 +836,9 @@ OOM产生的原因多种多样，有些程序未必产生OOM，不断FGC(CPU飙�
 * -XX:PreTenureSizeThreshold
   大对象到底多大
 * -XX:MaxTenuringThreshold
+
+
+
 * -XX:+ParallelGCThreads
   并行收集器的线程数，同样适用于CMS，一般设为和CPU核数相同
 * -XX:+UseAdaptiveSizePolicy
@@ -817,18 +850,22 @@ OOM产生的原因多种多样，有些程序未必产生OOM，不断FGC(CPU飙�
 * -XX:ParallelCMSThreads
   CMS线程数量
 * -XX:CMSInitiatingOccupancyFraction
-  使用多少比例的老年代后开始CMS收集，默认是68%(近似值)，如果频繁发生SerialOld卡顿，应该调小，（频繁CMS回收）
+  使用多少比例的老年代后开始CMS收集，默认是68%(近似值)，如果频繁发生SerialOld卡顿，应该调小（缺点：频繁CMS回收）
 * -XX:+UseCMSCompactAtFullCollection
   在FGC时进行压缩
 * -XX:CMSFullGCsBeforeCompaction
   多少次FGC之后进行压缩
 * -XX:+CMSClassUnloadingEnabled
 * -XX:CMSInitiatingPermOccupancyFraction
-  达到什么比例时进行Perm回收
+  达到什么比例时进行Perm回收，回收不用的class(1.8之前)
 * GCTimeRatio
   设置GC时间占用程序运行时间的百分比
 * -XX:MaxGCPauseMillis
   停顿时间，是一个建议时间，GC会尝试用各种手段达到这个时间，比如减小年轻代
+
+
+
+
 
 ### G1常用参数
 
@@ -909,10 +946,10 @@ OOM产生的原因多种多样，有些程序未必产生OOM，不断FGC(CPU飙�
 
       1. 扩内存
       2. 提高CPU性能（回收的快，业务逻辑产生对象的速度固定，垃圾回收越快，内存空间越大）
-      3. 降低MixedGC触发的阈值，让MixedGC提早发生（默认是45%）
+      3. **降低MixedGC触发的阈值，让MixedGC提早发生（默认是45%）**
 
  18. 问：生产环境中能够随随便便的dump吗？
-     小堆影响不大，大堆会有服务暂停或卡顿（加live可以缓解），dump前会有FGC
+     小堆影响不大，大 堆会有服务暂停或卡顿（加live可以缓解），dump前会有FGC
 
  19. 问：常见的OOM问题有哪些？
      栈 堆 MethodArea 直接内存

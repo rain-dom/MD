@@ -87,6 +87,11 @@ redis存储的key中包含着value和encoding
 
 默认16个库
 
+```java
+//启动
+redis-server.exe redis.windows.conf
+```
+
 ### 库级别
 
 | 命令                         | 功能                              |

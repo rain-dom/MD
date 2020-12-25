@@ -544,7 +544,7 @@ Direct Memory
 
 ![线程共享区域](E:\deng\deng\MD\jvm\img\线程共享区域.png)
 
-### 常用指令
+### 常见指令
 
 store
 
@@ -568,7 +568,180 @@ invoke
    JVM最难的指令
    lambda表达式或者反射或者其他动态语言scala kotlin，或者CGLib ASM，动态产生的class，会用到的指令
 
+##  GC的基础
 
+> C++
+>
+> 	- 手工处理垃圾
+>
+>  - 忘记回收
+>    - 内存泄露
+>  - 回收多次
+>    - 非法访问
+>    - 开发效率低，执行效率高
+>
+> Java
+>
+> 	* GC处理垃圾
+> 	* 开发效率高，执行效率低
+
+==没有任何引用==指向的一个对象或者多个对象（==循环引用==）
+
+#### 2.如何定位垃圾
+
+* 1.引用计数（ReferenceCount）
+  * 被引用次数为0 时清除
+  * 无法解决循环引用，引起内存泄露
+
+* 2.根可达算法(RootSearching)
+  * 通过正在使用的一些root程序向下找,找不到的都是垃圾
+
+#### 3.常见的垃圾回收算法
+
+1. 标记清除(mark sweep) - 找到垃圾，标记。
+   * 位置不连续 产生碎片 效率偏低（两遍扫描）
+   * 存活对象多的情况下效率比较高
+2. 拷贝算法 (copying) - 没有碎片，浪费空间
+   * 只用一半内存，回收时把在用的内存拷贝到备用空间。
+3. 标记压缩(mark compact) - 没有碎片，效率偏低（两遍扫描，指针需要调整）
+   * 效率比copy低，
+
+#### 4.JVM内存分代模型（用于分代垃圾回收算法）
+
+![堆内存逻辑分区](E:\deng\deng\MD\jvm\img\堆内存逻辑分区.png)
+
+8:1:1是因为根据经验，9成对象会被回收
+
+1. 部分垃圾回收器使用的模型
+
+   > 除Epsilon ZGC Shenandoah之外的GC都是使用逻辑分代模型
+   >
+   > G1是逻辑分代，物理不分代
+   >
+   > 除此之外不仅逻辑分代，而且物理分代
+
+2. 新生代 + 老年代 + 永久代（1.7）Perm Generation/ 
+   元数据区(1.8) Metaspace
+
+   1. 永久代 元数据 - Class
+   2. 永久代必须指定大小限制 ，元数据可以设置，也可以不设置，无上限（受限于物理内存）
+   3. 字符串常量 1.7 - 永久代，1.8 - 堆
+   4. MethodArea逻辑概念 - 永久代、元数据
+
+3. 新生代 = Eden + 2个suvivor区 
+
+   1. YGC回收之后，大多数的对象会被回收，活着的拷贝进s0
+
+      > 比如一个for循环会new很多对象，然后被GC掉
+
+   2. 再次YGC，活着的对象eden + s0 -> s1
+
+   3. 再次YGC，eden + s1 -> s0
+
+   4. 年龄足够 -> 老年代 （大部分15岁， CMS 6岁）
+
+   5. s区==装不下== -> 老年代
+
+4. 老年代
+
+   1. 顽固分子
+   2. 老年代满了FGC（Full GC）
+
+5. GC Tuning (Generation) ==调优目标==
+
+   1. 尽量减少FGC
+
+      > 非常耗时，会出现STW（stop world），系统停顿现象
+
+   2. MinorGC = YGC
+
+   3. MajorGC = FGC
+
+6. 对象分配过程图
+
+> 
+
+   ![](E:/deng/deng/MD/jvm/对象分配过程详解.png)
+
+7. 动态年龄：（不重要）
+   https://www.jianshu.com/p/989d3b06a49d
+
+8. 分配担保：（不重要）
+   YGC期间 survivor区空间不够了 空间担保直接进入老年代
+   参考：https://cloud.tencent.com/developer/article/1082730
+
+#### 5.常见的垃圾回收器
+
+![常用垃圾回收器](E:\deng\deng\MD\jvm\img\常用垃圾回收器.png)
+
+> 左边物理和概念上都分代，右边只是逻辑上分代
+>
+> 一般线上默认PS+PO
+>
+> 还有				PN+CMS
+
+1. JDK诞生后就伴随Serial，提高效率，诞生了PS，为了配合CMS，诞生了PN，CMS是1.4版本后期引入，CMS是里程碑式的GC，它开启了并发回收的过程，但是CMS毛病较多，因此目前没有  任何一个JDK版本默认是CMS
+   并发垃圾回收是因为无法忍受STW
+
+2. Serial 年轻代 串行回收
+
+   > 单线程，STW，回收时其他线程停止，现在用的极少
+
+3. PS 年轻代 并行回收
+
+   > 多线程，回收时其他线程停止
+
+4. ParNew 年轻代 配合CMS的并行回收
+
+   > PS基础上为了配合CMS
+
+5. SerialOld 
+
+6. ParallelOld
+
+7. ConcurrentMarkSweep 老年代 并发的， 垃圾回收和应用程序同时运行，降低STW的时间(200ms)
+   CMS问题比较多，所以现在没有一个版本默认是CMS，只能手工指定
+   CMS既然是MarkSweep，就一定会有碎片化的问题，碎片到达一定程度，CMS的老年代分配对象分配不下的时候，使用SerialOld 进行老年代回收
+   想象一下：
+   PS + PO -> 加内存 换垃圾回收器 -> PN + CMS + SerialOld（几个小时 - 几天的STW）
+   几十个G的内存，单线程回收 -> G1 + FGC 几十个G -> 上T内存的服务器 ZGC
+   算法：三色标记 + Incremental Update
+
+8. G1(10ms)
+   算法：三色标记 + SATB
+
+9. ZGC (1ms) PK C++
+   算法：ColoredPointers + LoadBarrier
+
+10. Shenandoah
+    算法：ColoredPointers + WriteBarrier
+
+11. Eplison
+
+12. PS 和 PN区别的延伸阅读：
+    ▪[https://docs.oracle.com/en/java/javase/13/gctuning/ergonomics.html#GUID-3D0BB91E-9BFF-4EBB-B523-14493A860E73](https://docs.oracle.com/en/java/javase/13/gctuning/ergonomics.html)
+
+13. 垃圾收集器跟内存大小的关系
+
+    1. Serial 几十兆
+    2. PS 上百兆 - 几个G
+    3. CMS - 20G
+    4. G1 - 上百G
+    5. ZGC - 4T - 16T（JDK13）
+
+1.8默认的垃圾回收：==PS== + ==ParallelOld==
+
+
+
+![CMS](E:\deng\deng\MD\jvm\img\CMS.png)
+
+
+
+
+
+
+
+# 其它
 
 ## 沙箱安全机制
 
