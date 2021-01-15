@@ -317,7 +317,7 @@ runnable优势
 在程序运行过程中，发生某些异常情况，导致当前线程无法再顺利执行下去，此时会进入阻塞状态，进入阻塞状态的原因消除之后，所有的阻塞队列会再次进入到就绪状态中，随机抢占cpu的资源，等待执行.
           进入的方式：
 
-（一）、等待阻塞：运行的线程执行**wait()**方法，JVM会把该线程放入等待池中。(wait会释放持有的锁)
+（一）、等待阻塞：运行的线程执行**wait()**方法，JVM会把该线程放入等待池中。(**wait会释放持有的锁**)
 
 （二）、同步阻塞：运行的线程在获取对象的同步锁时，若该**同步锁被别的线程占用**，则JVM会把该线程放入锁池中。
 
@@ -495,17 +495,17 @@ synchronized(Object)
 sleep不会释放锁，wait会
 
 **可重入锁**
-	如果加锁的方法a中调用了加锁方法b，当a发现b加锁的对象与自己相同时，会允许执行
+	如果加锁的方法a中调用了加锁方法b，当a发现b加锁的对象与自己相同时，会允许执行。
+如果不可重入，会死锁。
 
 ##### 锁的升级(无锁、偏向、自旋、重量级)
 
+synchronize的底层实现
+
 jdk早期是 重量级锁-os ,都要找操作系统（内核）去申请锁
-
-首先是偏向锁，markword 记录这个线程ID （二进制的头两位）
-
-如果线程争用，升级为自旋锁（占用cpu）
-
-自旋10次后升级为重量级锁-OS
+首先是**偏向锁**，markword 记录这个线程ID （二进制的头两位,00代表无锁，01代表偏向锁，10轻量级锁，11重量级锁）
+如果线程争用，升级为**自旋锁**（循环判断是否能拿到锁，占用cpu，但是不访问操作系统，只在用户态解决）
+自旋10次后升级为**重量级锁-OS**，进入等待状态，不占用cpu(状态不可退回，但虚拟机也可以实现)
 
 
 
@@ -599,6 +599,8 @@ public class Account {
 
 ##### 异常处理
 
+程序在执行过程中，如果出现异常，默认情况锁会被释放。
+
 ```java
 /**
  * 程序在执行过程中，如果出现异常，默认情况锁会被释放
@@ -676,7 +678,7 @@ public class T {
 * ABA问题	加版本号解决
   * 基础类型没有影响
   * 如果是引用类型，比如引用没变，但是内容变了
-  * 比如引用在中间被另一个线程改为b，改变了b,又改回a,恰巧a又对b有引用。
+  * 更改了对象引用的某个对象
 * 内部利用了Unsafe类实现cas操作
 
 LOCK类型？
@@ -715,9 +717,11 @@ public class AtomicInteger_ {
 }
 ```
 
-#### 递增程序时间比较
+#### LongAdder
 
-**LongAdder**是通过分块锁，分别加锁计算，最后再加起来得到总数。
+#### 不同方案并发时间比较
+
+**LongAdder**是通过分块锁，将一定数量的线程合并加锁，最后再加起来得到总数。并发特别高的时候有优势
 
 ```java
 package com.mashibing.juc.c_018_00_AtomicXXX;
@@ -836,10 +840,10 @@ public class T02_AtomicVsSyncVsLongAdder {
 
   * 公平锁下不会出现大规模线程1在执行，大概是线程1,2交替执行，线程1也会连续执行2次，因为在1执行完时，其他线程还没有进队列，线程1又一次进入，所以会连续执行，但不会大规模连续执行，因为线程2不会拖延太长时间挤不进去。
 
-* 使用方法
+* api
 
-  * trylock
-  * lockinterupptibly
+  * trylock（5，TimeUnit.SECONDS）
+  * lockinterupptibly (用此方法加锁，其被它线程可用interrupt打断 )
 
   ```java
   /**
@@ -916,11 +920,16 @@ public class T02_AtomicVsSyncVsLongAdder {
   
   ```
 
-#### LongAdder
+
+
+
 
 #### CountDownLatch
 
-拴住，latch不到0不让走。
+设置门栓数量，主线程调用await阻塞。
+线程调用countDown来使latch减一（随便你怎么减），直到latch减为0，解除await。
+
+也可以让其它线程调用join达到同样目的
 
 ```java
 package com.mashibing.juc.c_020;
@@ -989,15 +998,11 @@ public class T06_TestCountDownLatch {
 
 #### CyclicBarrier
 
-* 
-
 CyclicBarrier barrier = new CyclicBarrier(20，new Runnable(){})
-
-​	内部是逻辑，不写的话就不执行操作
-
-​	
-
+调用 barrier.await()，直到await达到20次，执行一次runnable中的代码
 每满20发一车
+
+**场景：**一个复杂操作需要其它各个操作完成再执行。那么在并发场景下，其它操作调用await
 
 ```java
 public class T07_TestCyclicBarrier {
@@ -1043,6 +1048,9 @@ public class T07_TestCyclicBarrier {
 ##### 读锁
 
 允许其它线程读，不许写
+
+所有readLock.lock均不会互相阻碍
+
 
 ##### 写锁   
 
@@ -1103,7 +1111,9 @@ public class T10_TestReadWriteLock {
 
 #### Semaphore
 
-限制同时运行的线程数量
+ `acquire()`阻塞获取锁，成功就-1，最后再`release()`,再+1.
+
+限制同时运行的线程数量，默认是非公平锁
 
 ```java
 public class T11_TestSemaphore {
@@ -1146,9 +1156,13 @@ public class T11_TestSemaphore {
 }
 ```
 
+#### Exchamge
+
+交换两个线程中的值
+
 #### LockSupport
 
-无需synchronize锁住某个目标（调用wait），就可以实现对线程的阻塞等控制
+无需synchronize锁住某个目标（或调用wait），就可以实现对线程的阻塞等控制
 
 LockSupport.park
 
@@ -1188,9 +1202,11 @@ public class TestLockSupport {
 
 #### 阿里题目
 
-观察者线程1与加内容线程2 synchronized同一个对象。观察者线程先启动，判断size不是5，调用wait，另一个线程到达5时唤醒线程1，同时自己调用wait，释放锁让1拿到锁继续走流程
+观察者线程1与加内容线程2 synchronized同一个对象。观察者线程先启动，判断size不是5，调用wait，另一个线程到达5时唤醒线程1，同时自己调用wait，释放锁让1拿到锁继续走流程，流程最后需要再调用notify唤醒线程2
 
 
+
+直接用LinkedList这种非线程安全的容器会出问题，因为size方法更新不是即使的，另一个线程无法即使感知到当前线程添加元素导致的size值的变化。给list加上volatile也无法解决
 
 ##### *synchronize 写法
 
@@ -1271,9 +1287,10 @@ public class T04_NotifyFreeLock {
                System.out.println("add " + i);
                
                if(c.size() == 5) {
+                  // 唤醒t1
                   lock.notify();
-                  //释放锁，让t2得以执行
                   try {
+                      //释放锁，让t2得以执行
                      lock.wait();
                   } catch (InterruptedException e) {
                      e.printStackTrace();
@@ -1364,6 +1381,8 @@ public class T05_CountDownLatch {
 ```
 
 ##### LockSupport_WithoutSleep
+
+t2直接park，t1判断自己size到5的时候，unpark打开t2，自己park住。t2执行完再unpark打开t1
 
 ​	睡眠会给线程2缓冲的时间
 
@@ -1595,6 +1614,25 @@ public class MyContainer2<T> {
 
 堆内存共享，各线程有自己的工作内存，使用堆内存变量时先取回自己的工作内存，更改后写回堆内存的时间不好控制。导致线程之间不可见
 
+* 保证线程可见性
+
+  * 不同线程取到公共堆中的值，先在copy到自己的空间改变，再写回公共空间，而另一个线程不知道何时发生改变，双方数据不能及时共享，及不可见。
+
+    加了volatile后，一个线程改变变量后，另一个线程会马上发现
+
+  * 实际底层根据了cpu的 MESI 缓存一致性协议
+    毕竟如果读取过程中又被改了，还是需要硬件层面来保证
+
+* 禁止指令重排序
+
+  * 创建对象流程：
+    * 1.申请内存，如给a赋值为0，此时不为null
+    * 2.给a赋值，如a=8
+    * 3.将a赋值给INSTANCE
+  * 如果先指向了a=0，此时不是空值了，另一个线程判断INSTANCE不为空，直接用了a=0，大问题。但一般也不会出现
+
+没有把握尽量不要用volatile，用也是修饰小一点的东西，别修饰引用对象
+
 ```java
 public class T1_H {
     /*volatile*/ static boolean time = true;
@@ -1622,15 +1660,43 @@ public class T1_H {
 }
 ```
 
-* 保证线程可见性
-  * 不同线程取到公共堆中的值，先在自己的空间改变，双方数据不能及时共享，及不可见
-  * 使用了MESI 缓存一致性协议
-* 禁止指令重排序
-  * 创建对象流程：
-    * 1.申请内存，如给a赋值为0，此时不为null
-    * 2.给a赋值，如a=8
-    * 3.将a赋值给INSTANCE
-  * 如果先指向了a=0，此时不是空值了，另一个线程可以拿到锁
+```java
+public class Mgr06 {
+    private static volatile Mgr06 INSTANCE; //JIT
+
+    private Mgr06() {
+    }
+
+    public static Mgr06 getInstance() {
+        if (INSTANCE == null) {
+            //双重检查
+            synchronized (Mgr06.class) {
+                if(INSTANCE == null) {
+                    try {
+                        Thread.sleep(1);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    INSTANCE = new Mgr06();
+                }
+            }
+        }
+        return INSTANCE;
+    }
+
+    public void m() {
+        System.out.println("m");
+    }
+
+    public static void main(String[] args) {
+        for(int i=0; i<100; i++) {
+            new Thread(()->{
+                System.out.println(Mgr06.getInstance().hashCode());
+            }).start();
+        }
+    }
+}
+```
 
 ### 锁优化
 
@@ -1657,11 +1723,7 @@ public class T1_H {
 
 * * 
 
-
-
-### 锁原理（AQS）
-
-
+实际用起来synchronize也不慢
 
 ### 2.3 JUC-java.util .concurrent
 
@@ -1722,15 +1784,29 @@ public class testR {
 
 ### AQS
 
-cas操作tail
+上面所有锁的底层实现
+
+使用了模板方法、回调函数
+
+默认非公平锁的实现
+
+![AQS](E:\deng\deng\MD\jvm\img\AQS.png)
 
 ![AQS](E:\deng\deng\MD\image\AQS.png)
 
+上来调用tryquire，拿不到锁就进队列
+
 state是一个volatle的int类型，用于判断是否加锁，并且设置state的方法除了有setState,还有compareAndSetState
 
-内部维护一个线程队列
+所以有人称AQS底层就是volatile+CAS
 
-如果c == 0 ,通过cas将其变为1
+state会根据子类不同实现，有着不同的意义
+
+state内部维护着一个队列，是AQS的内部类
+node中装着thread,并且node是个双向链表，没抢到锁的通过addwaiter方法进入队列
+(addWaiter方法是一个死循环，cas试图加在链表后面，因为不是锁整个链表，所以效率还行)
+
+拿到后判断，如果c == 0 ,通过cas将state其变为1,并将当前线程设置为独占线程
 
 
 
@@ -1746,17 +1822,19 @@ state是一个volatle的int类型，用于判断是否加锁，并且设置state
 
 ### ThreadLocal
 
-线程独有
+线程独有，线程B向threadLocal设值，线程A无法从threadLocal中读到。
 
-* set方法
+* `threadLocal.set()`
   * Thread.currentThread.map.set(ThreadLocal,value)
-  * 设置到了当前线程的map中，所以另一个线程get不到
+  * 值被设置到了一个map中，key是调用该方法的当前线程，是设置到了当前线程的map，所以另一个线程get不到
+  * 这个map就是个weakHahsMap
 * 在声明式事务中
   * 第一个拿到connection后，放入ThreadLocal中，后续的从local拿，这样不会使得拿到不同的connection。
-
 * map中的key是弱引用，value是强引用
+  * tl强引用指向ThreadLocal，并且是作为map中的key，并且key是弱引用指向ThreadLocal
   * 当tl对ThreadLocal的引用消失时，key的引用会自动消失，否则会造成内存泄露
-  * 即便如此还还会有内存泄露（如下图），因此不用的时候要remove()掉
+  * 即便如此还还会有内存泄露（如下图中小字），因此tl不用的时候要`tl.remove()`掉
+* 
 
 ![弱引用](E:\deng\deng\MD\image\弱引用.png)
 
@@ -1815,17 +1893,19 @@ public class ThreadLocal2 {
 
 ### 强引用
 
-普通引用
+普通引用就是强引用
 
-
+垃圾回收会调用`finalize()`，重写它来观察什么时候对对象进行了回收。
 
 ```java
 public class T01_NormalReference {
     public static void main(String[] args) throws IOException {
         M m = new M();
         m = null;
+        //因为改变了m指向，new M()变成空了
         System.gc(); //DisableExplicitGC
-
+        
+        //这个方法可以阻塞住线程
         System.in.read();
     }
 }
@@ -1833,9 +1913,9 @@ public class T01_NormalReference {
 
 ### 软引用
 
-做缓存用(面试用）
+做缓存用，内存够你就在放着，用到时直接拿。内存不够时再把你GC掉(面试用）
 
-内存够时就放那，不够再gc回收
+memachace、tomcat中用到了
 
 ```java
 /**
@@ -1873,9 +1953,9 @@ public class T02_SoftReference {
 
 ### 弱引用
 
-一般用在容器中，和强引用指向同一对象，强引用消失时，弱引用一并回收
+GC发现后会直接干掉
 
-直接干掉
+一般用在容器中，和强引用指向同一对象，强引用消失时，弱引用一并回收
 
 
 
@@ -1883,9 +1963,19 @@ public class T02_SoftReference {
 
 高并发5 2h
 
-管理对外内存，对调用api的人无意义，因此get为null;
+管理对外内存，是给写JVM的人用的，对调用api的人无意义，因此get为null;
 
 ## 线程池
+
+
+
+### 基础概念
+
+#### Executor
+
+将线程定义和线程执行分开
+
+
 
 #### Callable
 
@@ -1920,6 +2010,10 @@ public class T03_Callable {
 }
 ```
 
+#### Future
+
+存储执行产生的将来的结果
+
 #### FutureTask
 
 既是Runnable又是Future
@@ -1943,7 +2037,7 @@ public class T06_00_Future {
 
 #### ==CompletableFuture
 
-对于多个Future的管理
+对于多个Future的管理，需要查三家网站的同一产品价格，最后汇总展示
 
 allOf(A,B,C)	
 
@@ -1980,17 +2074,17 @@ public class T06_01_CompletableFuture {
         //执行异步任务。 
         CompletableFuture<Double> futureTM = CompletableFuture.supplyAsync(()->priceOfTM());
         CompletableFuture<Double> futureTB = CompletableFuture.supplyAsync(()->priceOfTB());
-        CompletableFuture<Double> futureJD = CompletableFuture.supplyAsync(()->priceOfJD());
+        CompletableFuture<Double> futureJD = CompletableFuture.supplyAsync(()->priceOfJD());                     
 
         //必须下面三个任务都完成，才输出结果
         CompletableFuture.allOf(futureTM, futureTB, futureJD).join();
 
-        CompletableFuture.supplyAsync(()->priceOfTM())
+ /*       CompletableFuture.supplyAsync(()->priceOfTM())
                 .thenApply(String::valueOf)
                 .thenApply(str-> "price " + str)
                 .thenAccept(System.out::println);
 
-
+*/
         end = System.currentTimeMillis();
         System.out.println("use completable future! " + (end - start));
 
@@ -2035,7 +2129,7 @@ public class T06_01_CompletableFuture {
 }
 ```
 
-
+### Executors-线程池的工厂
 
 ### ThreadPoolExecutor
 
@@ -2063,13 +2157,13 @@ public ThreadPoolExecutor(int corePoolSize,
 
 **TimeUnit.SECONDS**：时间单位
 
-**workQueue**：任务队列，任务可以储存在任务队列中等待被执行
+**workQueue（BlockingQueue）**：任务队列，任务可以储存在任务队列中等待被执行
 
-**threadFactory**：就是创建线程的线程工厂
+**threadFactory**：就是创建线程的线程工厂（可自定义创建线程方式，默认的创建线程方式）
 
-**handler**：拒绝策略
+**handler**(RejectStrategy)：拒绝策略，jdk默认提供了4种，可自定义
 
-
+> 阿里规范线程必须通过线程池提供，不允许自行显式创建
 
 ![为什么要线程池](E:\deng\image\为什么要线程池.png)
 
@@ -2079,7 +2173,7 @@ public ThreadPoolExecutor(int corePoolSize,
 
 
 
-### Executors-线程池的工厂
+
 
 
 
@@ -2145,7 +2239,7 @@ ExecutorService继承自Executor
 
 ThreadPoolExecutor实现了ExecutorService接口
 
-![线程池分类](E:\编程\image\线程池分类.png)
+
 
 Executors.newCachedThreadPool
 
@@ -2178,7 +2272,7 @@ public class ScheduledDemo {
 
 ### 拒绝策略
 
-以下是默认策略，实际一般不用，用自定义的
+以下是jdk默认策略，实际一般不用，用自定义的，保存到mq等等。
 
 **AbortPolicy:**不执行新任务，直接抛出异常，提示线程池已满
 
@@ -2186,7 +2280,7 @@ public class ScheduledDemo {
 
 **DisCardOldSetPolicy:**将排队时间最久的（第一个）替换为当前新进来的任务执行
 
-**CallerRunsPolicy:**直接调用execute来执行当前任务
+**CallerRunsPolicy:**多出的任务直接调用execute来执行。
 
 ##### Execute方法执行逻辑
 
@@ -2206,7 +2300,7 @@ RecursiveAction
 
 #### 原理
 
-每个线程维护自己的队列，执行完就去其它队列尾部拿
+每个线程维护自己的队列，执行完就去其它队列尾部拿。而ThreadPoolExecutor是多个线程用同一个队列
 
 线程执行自己的任务时不需要加锁，而执行其它线程任务时需要加锁
 
@@ -2382,16 +2476,16 @@ T023 FromHashtableToCHM
 
 ### 容器历史
 
-* hashtable 加锁 
-
+* vector、hashtable 自带锁 （有缺陷，现在不用）
 * hashmap 去除锁，增加效率
-
-* synchronizeHashMap	增加锁
-
+* synchronizeHashMap	增加加锁版本（性能也不比hashtable高多少）
 * concurrentHashMap	多线程专用
+  * 读效率很高，但写效率跟上面几个差不多
   * 但是没有concurrentTreeMap,因为树实现cas太复杂了
   * 但又需要一个排好序的容器，因此产生了 如下
 * concurrentSkipListMap 跳表
+  因为concurrentTreeMap不好实现，又需要一个排好序的便于查找
+  先从顶层查找，依次向下
   * ![跳表](E:\deng\deng\MD\image\跳表.png)
 
 
@@ -2505,7 +2599,7 @@ public class T04_TestConcurrentHashMap {
 
 #### Vector测试
 
-vector所谓的线程安全指的是调用容器方法，如remove时，访问时安全的。但是当卖到最后一张票时，各个线程判断size是否为空时没有争用，分别进入睡眠，再去取票，产生冲突。
+vector所谓的线程安全指的是调用容器方法加锁，如`size()`时，访问时安全的。但是当卖到最后一张票时，各个线程判断size是否为空时没有争用，分别进入睡眠，再去取票，产生冲突。
 
 ```java
 /**
@@ -2556,7 +2650,7 @@ public class TicketSeller2 {
 
 #### Queue卖票测试
 
-pull是一个原子操作，内部是cas实现的
+poll是一个原子操作，内部是cas实现的
 
 ```java
 package com.mashibing.juc.c_0test;
@@ -2576,6 +2670,7 @@ public class t2 {
         for (int i = 0; i < 10; i++) {
             new Thread(()->{
                 while (true){
+//poll是一个原子操作，判断tickets是否为空，内部是cas实现的
                     String poll = tickets.poll();
                     if (poll == null) break;
                     System.out.println("销售了" + poll);
@@ -2594,6 +2689,10 @@ public class t2 {
 
 ### 阻塞队列-BlockingQueue
 
+由Vector进一步推出queue
+
+天然的支持多线程存取，因为自带阻塞，不需要自己写程序的时候用synchronize之流加锁
+
 #### 方法
 
 ##### queue的方法
@@ -2604,7 +2703,7 @@ peek()	//取，不remove
 
 poll()		//取，并remove
 
-##### block在此基础上加的方法
+##### blockQueue在此基础上加的方法
 
 put		//装不进去就先阻塞
 
@@ -2622,6 +2721,8 @@ take		//取阻塞
 ##### LinkedBlockingQueue
 
 LinkedBlockingQuee实现取票
+
+实际就是`take()`自带阻塞，就可以实现卖票。线程数最大值是INTEGER最大值
 
 ```java
 public class T08_LinkedBlockingQueue {
@@ -2660,6 +2761,8 @@ public class T08_LinkedBlockingQueue {
 ```
 
 #### ==DelayQueue
+
+用于时间调度任务
 
 ```java
 package com.mashibing.juc.c_025;
@@ -2767,6 +2870,7 @@ public class T08_SynchronizeQueue { //容量为0
 strs.transfer("aaa"),必须有结果才会离开
 
 MQ底层就是用这种逻辑，比如，确认用户的订单得到了处理
+当你自己去实现mq的效果时就需要用这个了
 
 ```java
 package com.mashibing.juc.c_025;
