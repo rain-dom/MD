@@ -1975,8 +1975,6 @@ GC发现后会直接干掉
 
 将线程定义和线程执行分开
 
-
-
 #### Callable
 
 与Runnable类似，但callable有返回值
