@@ -998,7 +998,7 @@ TINYINT，SMALLINT，MEDIUMINT，INT，BIGINT
 
 
 
-#### 字符与字符串
+#### char与varchar
 
 char长度固定，最大长度255，会自动删除末尾的空格，
 
