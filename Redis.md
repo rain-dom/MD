@@ -2,14 +2,21 @@
 
 ### 为什么需要缓存
 
+关系型数据库建表：必须给出schema
+会提前根据数据的大小用0补充，这样后面增删改的时候可以直接复写
+
+内存里准备一个B+树
+
+
+
 * memcached和redis都是k-v型
-* 硬盘存储受IO影响，全用内存又太贵
+* 硬盘存储受IO影响大，全用内存快但又太贵所以折中的选择就是缓存
   * 数据在磁盘和内存的体积不一样
-  * ![硬盘常识](E:\deng\deng\MD\image\redis\硬盘常识.png)
+  * ![硬盘常识](Redis.assets/硬盘常识.png)
 
 ### 为什么要选Redis
 
-都是kv的数据库，为何选redis
+都是kv的数据库，为何选redis。用json也可以存储很复杂的数据类型，那么还要数据类型的
 
 * 如果客户端想取回缓存v中的某个元素，memcached会返回value所有的数据到client，server网卡IO瓶颈，client要有你实现的代码去解码
 * 而redis存储的value又自己的类型
@@ -25,7 +32,7 @@
   * 那么它怎么才能做到随着业务变化而改变存储的热数据？
   * 因为内存有限，必须更新热数据
 
-![淘汰机制](E:\deng\deng\MD\image\redis\淘汰机制.png)
+![淘汰机制](Redis.assets/淘汰机制.png)
 
 1.通过业务逻辑更新key
 
@@ -79,13 +86,17 @@ mmap共享空间
 
 ### redis运行原理
 
-单进程、单实例
+单进程、单线程、单实例。在高并发的时候为什么可以这么快
 
 redis存储的key中包含着value和encoding
 
+
+
+所有连接先到kernel，操作系统内核通过epol调用的方式来遍历连接
+
 ## redis使用
 
-默认16个库
+**默认16个库**
 
 ```java
 //启动
@@ -148,15 +159,21 @@ redis-server.exe redis.windows.conf
 | INCRBYFLOAT  k  0.5  | 累加小数        |
 |                      |                 |
 
+#### 秒杀
+
+incr操作可以规避并发下对数据库事务的操作，完全由redis内存操作代替。
+
 ### **bitmap**
+
+![image-20220417174921879](Redis.assets/image-20220417174921879.png)
 
 | **bitmap**                   | **二进制位操作**（ASCII）    |
 | ---------------------------- | ---------------------------- |
-| setbit k 1 v                 | 0100 0000                    |
+| setbit k 1 v（把）           | 0100 0000                    |
 | bitpos key bit [start] [end] | 看第一个bit在二进制的位置    |
 | bitcount key [start] [end]   | 看1出现的次数                |
 | bitop and andkey k1 k2       | k1和k2按位与，结果存入andkey |
-| bitop or or key k1 k2        | k1和k2按位或，结果存入orkey  |
+| bitop or key k1 k2           | k1和k2按位或，结果存入orkey  |
 
 #### 登录记录
 
@@ -168,13 +185,21 @@ redis-server.exe redis.windows.conf
 * bitcount dzp -2 -1
   * 统计最后两周登录次数
 
-统计活跃人数
+#### 统计活跃人数
+
+日期为key, 用户id为位。或者反过来
+
+setbit 20220417 1 1
+
+每个用户对应bitmap的一个位置，那么先调用bittop or key k1 k2按位与，得到的结果再调用bitcount，即可计算出每一天的活跃用户量
+
+40多M就可以存储京东全年1kw用户量。
 
 ### List
 
-实现栈：同向push、pop
+实现栈：同向push、pop （lpush,lpop）
 
-实现队列：反向push、pop
+实现队列：反向push、pop (lpush,rpop)
 
 | 命令                    | 功能                             |
 | ----------------------- | -------------------------------- |
@@ -255,7 +280,7 @@ help @pubsub
 | publish world hello | 向world推送hello |
 | subscribe world     | 监听             |
 
-![发布订阅](E:\deng\deng\MD\image\redis\发布订阅.png)
+![发布订阅](Redis.assets/发布订阅.png)
 
 
 
@@ -265,7 +290,7 @@ help @pubsub
 
 持久化的通过kafka慢慢写到数据库中
 
-![发布订阅方案2](E:\deng\deng\MD\image\redis\发布订阅方案2.png)
+![发布订阅方案2](E:\deng\deng\MD\ima e\redis\发布订阅方案2.png)
 
 或者pub、sub用一个redis
 
@@ -275,7 +300,7 @@ help @pubsub
 
 help @transactions
 
-![事务](E:\deng\deng\MD\image\redis\事务.png)
+![事务](Redis.assets/事务.png)
 
 redis事务采用的是乐观锁，先watch住k1，等到exec的时候再看k1是否变化
 
@@ -283,20 +308,34 @@ redis事务采用的是乐观锁，先watch住k1，等到exec的时候再看k1�
 
 
 
-## 过滤器
+## 布隆过滤器
 
 **布隆过滤器**
+
+module模块可选，扩展redis-server功能
+解决缓存穿透的问题
+
+数据库中的元素经过不同的映射函数让bitmap上的不同二进制位变为1.
+
+空间换时间，这个空间成本很低
+
+![image-20220418143414177](Redis.assets/image-20220418143414177.png)
 
 ![过滤器](E:\deng\deng\MD\image\redis\过滤器.png)
 
 不能完全抵挡，但可以抵挡一部分，并且成本低
 
+
+
 * 新增数据要对bloom添加（双写问题）
 
 * 如果还是穿透了
-* client到redis中增加相应的key,通过value标记，后面的数据就会直接命中这个key，发现不存在
+  * client到redis中增加相应的key,通过value标记，后面的数据就会直接命中这个key，发现不存在
 
+#### 使用
 
+BF.ADD key a1
+BF.EXISTS key a2    	会显示0
 
 
 
@@ -304,7 +343,7 @@ redis事务采用的是乐观锁，先watch住k1，等到exec的时候再看k1�
 
 ## 过期时间
 
-![淘汰机制](E:\deng\deng\MD\image\redis\淘汰机制.png)
+![淘汰机制](Redis.assets/淘汰机制-16502860613941.png)
 
 | 命令                           | 功能                          |
 | ------------------------------ | ----------------------------- |
@@ -323,7 +362,7 @@ redis事务采用的是乐观锁，先watch住k1，等到exec的时候再看k1�
 
 
 
-## 持久化
+
 
 # Redis管理
 
@@ -333,11 +372,11 @@ redis事务采用的是乐观锁，先watch住k1，等到exec的时候再看k1�
 
 写时复制	内核机制
 
-![写时复制](E:\deng\deng\MD\image\redis\写时复制.png)
+![写时复制](Redis.assets/写时复制.png)
 
 拍摄快照是一个过程，过程中数据可能变化，用到了写时复制的特性
 
-`fork()`操作复制的是指针
+系统调用`fork()`操作复制的是指针，父子进程是隔离的，数据不共享
 
 fork后父进程修改数据实际上是写入其它的物理地址而不是覆盖原先的地址
 
@@ -360,7 +399,7 @@ RDB持久化方式能够在指定的时间间隔能对你的数据进行快照�
 
 #### 
 
-![RDB](E:\deng\deng\MD\image\redis\RDB.png)
+![RDB](Redis.assets/RDB.png)
 
 #### **优点**：
 
@@ -380,7 +419,7 @@ RDB持久化方式能够在指定的时间间隔能对你的数据进行快照�
 
 AOF持久化方式记录每次对服务器写的操作,当服务器重启的时候会重新执行这些命令来恢复原始的数据,AOF命令以redis协议追加保存每次写的操作到文件末尾.Redis还能对AOF文件进行后台重写,使得AOF文件的体积不至于过大.
 
-![AOF](E:\deng\deng\MD\image\redis\AOF.png)
+![AOF](Redis.assets/AOF.png)
 
 #### **优点**：
 
@@ -393,6 +432,13 @@ AOF持久化方式记录每次对服务器写的操作,当服务器重启的时�
 * AOF文件大
 * 回复慢
 
+
+
+#### AOF文件语法
+
+set k1 2
+$3 set $2 k1 $1 2
+
 #### 操作
 
 appendfsync always
@@ -403,13 +449,7 @@ appendfsync no	(buffer满时系统自动刷，更不安全)
 
 ## 集群
 
-### 概念
-
-Redis 集群是一个提供在**多个Redis节点间共享数据**的程序集。
-
-twitter、predixy、cluster三种实现方式
-
-### 问题
+### 为什么需要集群
 
 因为redis是单机、单节点、单实例的，所以会出现3个问题
 
@@ -419,11 +459,19 @@ twitter、predixy、cluster三种实现方式
 
 3.访问压力
 
+### 概念
+
+Redis 集群是一个提供在**多个Redis节点间共享数据**的程序集。
+
+twitter、predixy、cluster三种实现方式
+
+
+
 #### 解决数据一致性问题
 
 
 
-![数据一致性](E:\deng\deng\MD\image\redis\数据一致性.png)
+![数据一致性](Redis.assets/数据一致性.png)
 
 1.同步阻塞，强一致性，但是会破坏可用性
 
@@ -437,7 +485,7 @@ twitter、predixy、cluster三种实现方式
 
 这些方案（算法）可以从层迁移到proxy层
 
-![分片算法](E:\deng\deng\MD\image\redis\分片算法.png)
+![分片算法](Redis.assets/分片算法.png)
 
 * 1.通过业务逻辑划分，不同redis存储不同业务数据，redis自身是不知道的
 * 2.modula（hash取模）基本不用，会影响分布式下的扩展性。因为你一开始用的模数会限制自己
@@ -449,11 +497,11 @@ twitter、predixy、cluster三种实现方式
 
 #### redis压力大
 
-![连接成本高](E:\deng\deng\MD\image\redis\连接成本高.png)
+![连接成本高](Redis.assets/连接成本高.png)
 
 1.通过反向代理做负载均衡
 
-![反向代理](E:\deng\deng\MD\image\redis\反向代理.png)
+![反向代理](Redis.assets/反向代理.png)
 
 2.再给proxy做集群，通过LVS访问集群
 
@@ -481,7 +529,9 @@ redis追求的就是快，所以选用的是异步，面临数据丢失的风险
 
 redis拷贝RDB的时候掉线了几秒，需要通过offset去队列中拿到rdb后面的操作数据
 
-![增量复制](E:\deng\deng\MD\image\redis\增量复制.png)
+redis通过磁盘IO存储RDB，再通过网络IO传输到从机
+
+![增量复制](Redis.assets/增量复制.png)
 
 ![主从同步数据](E:\deng\deng\MD\image\redis\主从同步数据.png)
 
@@ -495,7 +545,9 @@ replicaof 127.0.0.1 6379	追随6379
 
 replicaof  no one	恢复为主，可写
 
+### 从机同步过程
 
+先清除自己的内容
 
 ### 其它配置
 
