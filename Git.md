@@ -1,4 +1,4 @@
-## 结构
+### 结构
 
 
 
@@ -8,7 +8,7 @@
 
 ![git](E:\deng\image\git.png)
 
-## 常用命令
+
 
 git --version 	康康版本
 
